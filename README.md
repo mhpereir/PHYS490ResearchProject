@@ -27,4 +27,4 @@ To run `main.py`, use
 
 ```sh
 python3 main.py --train_path=data/training_data.h5 --test_path=data/test_data.h5 --params_path=data/params.json
-'''
+```
