@@ -14,15 +14,15 @@ class Data():
             teff  = np.array(f5['TEFF'], dtype=float)
             spect = np.array(f5['spectrum'], dtype=float)
             
-            self.x_train = spect
-            self.y_train = np.concatenate((fe_h, logg, teff), axis=1)
+            n = len(spect)
+            
+            self.x_train = spect.reshape(-1,1,n)
+            self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,1,n)
             
             fe_h = None
             logg = None
             teff = None
             spect = None
-            
-            
             
             
         with h5py.File(test_file_name, 'r') as f5:            
@@ -34,10 +34,13 @@ class Data():
             teff  = np.array(f5['TEFF'], dtype=float)
             spect = np.array(f5['spectrum'], dtype=float)
             
-            self.x_test = spect
-            self.y_test = np.concatenate((fe_h, logg, teff), axis=1)
+            n = len(spect)
+            
+            self.x_test = spect.reshape(-1,1,n)
+            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,1,n)
             
             fe_h = None
             logg = None
             teff = None
             spect = None
+            

@@ -19,9 +19,9 @@ class StarNet(nn.Module):
     def __init__(self):
         super(StarNet, self).__init__()
         
-        self.conv1    = nn.Conv2d(in_channels=1, out_channels=4,  kernel_size=8, stride=1, padding=1)
-        self.conv2    = nn.Conv2d(in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
-        self.maxpool  = nn.MaxPool2d(kernel_size=4, stride=4, padding=0)
+        self.conv1    = nn.Conv1d(in_channels=1, out_channels=4,  kernel_size=8, stride=1, padding=1)
+        self.conv2    = nn.Conv1d(in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
+        self.maxpool  = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
         
         self.fc1      = nn.Linear(256,128)
         self.fc2      = nn.Linear(128,3)
@@ -29,17 +29,17 @@ class StarNet(nn.Module):
 
     def init_data(self,data,cuda):
         if cuda:
-            self.inputs_train  = torch.from_numpy(data.x_train).cuda()
-            self.targets_train = torch.from_numpy(data.y_train).cuda().long()
+            self.inputs_train  = torch.from_numpy(data.x_train).cuda().double()
+            self.targets_train = torch.from_numpy(data.y_train).cuda().double()
             
-            self.inputs_test  = torch.from_numpy(data.x_test).cuda()
-            self.targets_test = torch.from_numpy(data.y_test).cuda().long()
+            self.inputs_test  = torch.from_numpy(data.x_test).cuda().double()
+            self.targets_test = torch.from_numpy(data.y_test).cuda().double()
         else:
-            self.inputs_train  = torch.from_numpy(data.x_train)
-            self.targets_train = torch.from_numpy(data.y_train).long()
+            self.inputs_train  = torch.from_numpy(data.x_train).double()
+            self.targets_train = torch.from_numpy(data.y_train).double()
 
-            self.inputs_test  = torch.from_numpy(data.x_test)
-            self.targets_test = torch.from_numpy(data.y_test).long()
+            self.inputs_test  = torch.from_numpy(data.x_test).double()
+            self.targets_test = torch.from_numpy(data.y_test).double()
             
             
     def forward(self,x):

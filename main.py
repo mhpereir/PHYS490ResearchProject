@@ -41,13 +41,11 @@ if __name__ == '__main__':
     
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=param_file['lr'])
-    loss       = torch.nn.L1Loss()
+    loss       = torch.nn.MSELoss()
     
     obj_vals   = []
     cross_vals = []
     num_epochs = int(param_file['n_epoch'])
-    
-    
     
     # Training loop
     for epoch in range(1, num_epochs + 1):
