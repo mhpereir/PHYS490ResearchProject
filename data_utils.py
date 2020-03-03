@@ -14,10 +14,10 @@ class Data():
             teff  = np.array(f5['TEFF'], dtype=float)
             spect = np.array(f5['spectrum'], dtype=float)
             
-            n = len(spect)
+            n = len(spect[0,:])
             
             self.x_train = spect.reshape(-1,1,n)
-            self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(n,3)
+            self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
             
             fe_h = None
             logg = None
@@ -34,10 +34,10 @@ class Data():
             teff  = np.array(f5['TEFF'], dtype=float)
             spect = np.array(f5['spectrum'], dtype=float)
             
-            n = len(spect)
+            n = len(spect[0,:])
             
-            self.x_test = spect.reshape(n,1,-1)            
-            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(n,3)
+            self.x_test = spect.reshape(-1,1,n)            
+            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
             
             fe_h = None
             logg = None
