@@ -17,7 +17,7 @@ class Data():
             n = len(spect)
             
             self.x_train = spect.reshape(-1,1,n)
-            self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,1,n)
+            self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(n,3)
             
             fe_h = None
             logg = None
@@ -36,8 +36,8 @@ class Data():
             
             n = len(spect)
             
-            self.x_test = spect.reshape(-1,1,n)
-            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,1,n)
+            self.x_test = spect.reshape(n,1,-1)            
+            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(n,3)
             
             fe_h = None
             logg = None

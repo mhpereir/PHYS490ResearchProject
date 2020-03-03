@@ -13,7 +13,7 @@ class StarNet(nn.Module):
         Max Pooling   (16 @ 1x1803)
         FC_1          (1x256)           [ReLU]
         FC_2          (1x128)           [ReLU]
-        Output        (1x3)             [Linear]
+        FC_3          (1x3)             [Linear]
     '''
     
     def __init__(self):
@@ -23,8 +23,9 @@ class StarNet(nn.Module):
         self.conv2    = nn.Conv1d(in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
         self.maxpool  = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
         
-        self.fc1      = nn.Linear(256,128)
-        self.fc2      = nn.Linear(128,3)
+        self.fc1      = nn.Linear(179088,256)
+        self.fc2      = nn.Linear(256,128)
+        self.fc3      = nn.Linear(128,3)
         
 
     def init_data(self,data,cuda):
@@ -50,7 +51,8 @@ class StarNet(nn.Module):
         out = out.view(out.size(0),-1)  #flatten for FC
         
         out = func.relu(self.fc1(out))
-        out = self.fc2(out)
+        out = func.relu(self.fc2(out))
+        out = self.fc3(out)
         return out
         
         
@@ -66,6 +68,13 @@ class StarNet(nn.Module):
         optimizer.step()
         return obj_val.item()
         
+    def test(self, loss):
+        self.eval()
+        with torch.no_grad():
+            outputs= self(self.inputs_test)
+            cross_val= loss(outputs, self.targets_test)  #self.forward(inputs)
+        return cross_val.item()    
+    
         
     def reset(self):
         self.conv1.reset_parameters()

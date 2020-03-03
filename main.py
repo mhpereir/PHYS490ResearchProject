@@ -35,7 +35,7 @@ if __name__ == '__main__':
         param_file = json.load(paramfile)
     
     data  = Data(train_file_path, test_file_path)
-    model = StarNet()
+    model = StarNet().double()
     
     model.init_data(data,cuda_input)
     
@@ -79,5 +79,5 @@ if __name__ == '__main__':
     fig.savefig(args.output_path + 'fig.pdf')
     plt.close()
     
-    model.predict_test()
+    #model.predict_test()
     
