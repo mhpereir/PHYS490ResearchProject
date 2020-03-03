@@ -19,11 +19,11 @@ class StarNet(nn.Module):
     def __init__(self):
         super(StarNet, self).__init__()
         
-        self.conv1    = nn.Conv1d(in_channels=1, out_channels=4,  kernel_size=8, stride=1, padding=1)
-        self.conv2    = nn.Conv1d(in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
+        self.conv1    = nn.Conv1d(in_channels=1, out_channels=2,  kernel_size=8, stride=1, padding=1)
+        self.conv2    = nn.Conv1d(in_channels=2, out_channels=4, kernel_size=8, stride=1, padding=1)
         self.maxpool  = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
         
-        self.fc1      = nn.Linear(179088,256)
+        self.fc1      = nn.Linear(7204,256) #179088
         self.fc2      = nn.Linear(256,128)
         self.fc3      = nn.Linear(128,3)
         

@@ -17,7 +17,7 @@ if __name__ == '__main__':
                         help='test data file name (hdf5)')
     parser.add_argument('--params_path', metavar='params',
                         help='hyper params file name (json)')
-    parser.add_argument('--output_path', metavar='results',
+    parser.add_argument('--output_path', metavar='results', default='',
                         help='path to results')
     parser.add_argument('-v', type=int, default=2, metavar='N',
                         help='verbosity (default: 2)')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     ax.plot(range(num_epochs), obj_vals, label= "Training loss", color="blue")
     ax.plot(range(num_epochs), cross_vals, label= "Test loss", color= "green")
     ax.legend()
-    ax.set_ylim([0,1])
+    #ax.set_ylim([0,1])
     fig.savefig(args.output_path + 'fig.pdf')
     plt.close()
     
