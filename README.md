@@ -1,14 +1,15 @@
-# PHYS490ResearchProject
+# PHYS490 Research Project
 Research project for PHYS 490 course.
 
 ___
 Paper: https://academic.oup.com/mnras/article/475/3/2978/4775133
 
+---
 
 Authors:
 
-- name: Matthew Pereira Wilson, Shoshannah Byrne-Mamahit, Shreyas Shankar
-- student ID: 20644035, ??, ??
+- names: Matthew Pereira Wilson, Shoshannah Byrne-Mamahit, Shreyas Shankar
+- student IDs: 20644035, ??, 20602181
 
 ## Dependencies
 
