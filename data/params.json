@@ -1,5 +1,5 @@
 {
-	"n_epoch"	: 30,
+	"n_epoch"	: 70,
 	"n_test"	: 10,
 	"lr"		: 7e-4,
 	"n_epoch_v"	: 2,

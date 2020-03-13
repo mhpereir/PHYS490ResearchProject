@@ -36,11 +36,15 @@ class Data():
             
             n = len(spect[0,:])
             
-            self.x_test = spect.reshape(-1,1,n)            
-            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
+            self.x_test = spect.reshape(-1,1,n)[0:10,:,:]     
+            self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)[0:10,:]
             
             fe_h = None
             logg = None
             teff = None
             spect = None
+            
+        
+        
+        
             

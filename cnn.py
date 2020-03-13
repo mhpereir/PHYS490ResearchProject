@@ -23,7 +23,7 @@ class StarNet(nn.Module):
         self.conv2    = nn.Conv1d(in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
         self.maxpool  = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
         
-        self.fc1      = nn.Linear(179088,256)
+        self.fc1      = nn.Linear(28816,256)
         self.fc2      = nn.Linear(256,128)
         self.fc3      = nn.Linear(128,3)
         

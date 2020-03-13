@@ -10,19 +10,19 @@ from data_utils import Data
 if __name__ == '__main__':
     start_time = time()
     # Command line arguments (taken from tutorial script (lesson 5))
-    parser = argparse.ArgumentParser(description='Assignment 2: CNN script')
+    parser = argparse.ArgumentParser(description='Final Project: CNN script')
     parser.add_argument('--train_path', metavar='inputs',
                         help='training data file name (hdf5)')
     parser.add_argument('--test_path', metavar='inputs',
                         help='test data file name (hdf5)')
     parser.add_argument('--params_path', metavar='params',
                         help='hyper params file name (json)')
-    parser.add_argument('--output_path', metavar='results',
+    parser.add_argument('--output_path', metavar='results', default='results/',
                         help='path to results')
     parser.add_argument('-v', type=int, default=2, metavar='N',
                         help='verbosity (default: 2)')
-    parser.add_argument('-cuda', type=int, default=1, metavar='N',
-                       help='cuda indicator (default: 1 = ON)')
+    parser.add_argument('-cuda', type=int, default=0, metavar='N',
+                       help='cuda indicator (default: 0 = OFF)')
     args = parser.parse_args()
     
     train_file_path  = args.train_path
@@ -75,7 +75,6 @@ if __name__ == '__main__':
     ax.plot(range(num_epochs), obj_vals, label= "Training loss", color="blue")
     ax.plot(range(num_epochs), cross_vals, label= "Test loss", color= "green")
     ax.legend()
-    ax.set_ylim([0,1])
     fig.savefig(args.output_path + 'fig.pdf')
     plt.close()
     

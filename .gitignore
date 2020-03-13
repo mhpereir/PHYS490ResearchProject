@@ -1,4 +1,5 @@
 *.ini
 *.pyc
 *.h5
-./__pycache__/
+*.npy
+/__pycache__/
