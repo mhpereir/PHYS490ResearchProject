@@ -6,6 +6,7 @@ import torch
 from time import time
 from cnn import StarNet
 from data_utils import Data
+from processing_utils import post_processing
 
 if __name__ == '__main__':
     start_time = time()
