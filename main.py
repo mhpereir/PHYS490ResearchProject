@@ -36,17 +36,20 @@ if __name__ == '__main__':
     
     params_file_path = str(data_file_path) + '/params.json'
     
-    
     with open(params_file_path) as paramfile:
         param_file = json.load(paramfile)
     
-    data  = Data(data_file_path, train_data, test_data, param_file['n_cross'])
-    model = StarNet().float()
+    # Load in the training datasets
+    data  = Data(data_file_path, train_data, test_data)
+    data.load_train(param_file['n_cross'])
     
+    # Initialize the model
+    model = StarNet().float()
     
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=param_file['lr'])
     loss       = torch.nn.MSELoss()
+    
     
     obj_vals     = []
     cross_vals   = []
@@ -62,6 +65,7 @@ if __name__ == '__main__':
         print('Running with CPU')
     
     model.to(device)
+    
     # Training loop
     for epoch in range(1, num_epochs + 1):
         train_val,time_epoch = model.backprop(data, loss, optimizer, n_train, device)
@@ -83,7 +87,7 @@ if __name__ == '__main__':
         print('Final training loss: {:.4f}'.format(obj_vals[-1]))
         print('Final test loss: {:.4f}'.format(cross_vals[-1]))
     
-    print('Total ellapsed time: {:.4f}m'.format( (time()-start_time)/60) )
+    print('Training time ellapsed: {:.4f}m'.format( (time()-start_time)/60) )
     
     # Plot saved in results folder
     fig,ax = plt.subplots()
@@ -93,5 +97,12 @@ if __name__ == '__main__':
     fig.savefig('results/loss.pdf')
     plt.close()
     
-    #model.predict_test()
+    data.close('train')
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    ## beginning of post processing 
+    
+    data.load_test()
+    predicted_targets = model.model_predictions(data, n_train, device)
+    data.close('test')
+    
     

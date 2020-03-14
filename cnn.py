@@ -114,13 +114,51 @@ class StarNet(nn.Module):
     def cross(self, data, loss, device):
         inputs  = torch.from_numpy(data.x_cross[:,:,:]).to(device).float()
         targets = torch.from_numpy(data.y_cross_norm[:,:]).to(device).float()
-        
+        self.eval()
         with torch.no_grad():
             outputs   = self(inputs)
             cross_val = loss(outputs, targets)
             
         return cross_val.item()    
     
+    def model_predictions(self, data, n_train, device):
+        self.eval()
+        with torch.no_grad():
+            n_total   = len(data.x_test[:,0,0])
+            iters     = int(np.floor(n_total/n_train))
+            loss_vals = []
+            
+            print('Running #{} iterations for test data.'.format(iters))
+            
+            start_time = time()
+            
+            for i in range(iters-1):
+                args_lower = i*n_train 
+                args_upper = (i+1)*n_train
+                
+                
+                inputs  = torch.from_numpy(data.x_test[args_lower:args_upper,:,:]).to(device).float()
+                outputs= self(inputs) 
+                
+                if i == 0:
+                    predicted_target_array = outputs.cpu().numpy()
+                else:
+                    predicted_target_array = np.concatenate((predicted_target_array, outputs.cpu().numpy()), axis=0)
+            
+            if n_total % n_train != 0:
+                #final step:    ##account for leftover indices in input array
+                args_lower = (i+1)*n_train 
+                args_upper = n_total - 1
+                
+                
+                inputs  = torch.from_numpy(data.x_test[args_lower:args_upper,:,:]).to(device).float()
+                outputs= self(inputs)
+                
+                predicted_target_array = np.concatenate((predicted_target_array, outputs.cpu().numpy()), axis=0)
+        
+        print('Target prediction ellapsed time: {:.4f}m'.format( (time()-start_time)/60) )
+        
+        return predicted_target_array
         
     def reset(self):
         self.conv1.reset_parameters()
@@ -128,6 +166,7 @@ class StarNet(nn.Module):
         self.maxpool.reset_parameters()
         self.fc1.reset_parameters()
         self.fc2.reset_parameters()
+        self.fc3.reset_parameters()
         
         
     
