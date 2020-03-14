@@ -43,38 +43,47 @@ if __name__ == '__main__':
     data  = Data(data_file_path, train_data, test_data, param_file['n_cross'])
     model = StarNet().float()
     
-    model.init_data(data,cuda_input)
     
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=param_file['lr'])
     loss       = torch.nn.MSELoss()
     
-    obj_vals   = []
-    cross_vals = []
-    num_epochs = int(param_file['n_epoch'])
+    obj_vals     = []
+    cross_vals   = []
+    num_epochs   = int(param_file['n_epoch'])
+    num_epochs_v = int(param_file['n_epoch_v'])
+    n_train      = int(param_file['n_mini_batch'])
     
-    #model = nn.DataParallel(model)
+    if torch.cuda.is_available() and cuda_input == 1:
+        device = 'cuda'
+        print('Running with CUDA')
+    else:
+        device = 'cpu'
+        print('Running with CPU')
+    
+    model.to(device)
     # Training loop
     for epoch in range(1, num_epochs + 1):
-        train_val = model.backprop(loss, optimizer, n_train=param_file['n_mini_batch'])
+        train_val,time_epoch = model.backprop(data, loss, optimizer, n_train, device)
         obj_vals.append(train_val)
         
-        cross_val = model.cross(loss)
+        cross_val = model.cross(data, loss, device)
         cross_vals.append(cross_val)
         
         # High verbosity report in output stream
         if args.v>=2:
-            if not ((epoch + 1) % int(param_file['n_epoch_v'])):
-                print('Epoch [{}/{}]'.format(epoch+1, num_epochs)+\
+            if not ((epoch) % num_epochs_v):
+                print('Epoch [{}/{}]'.format(epoch, num_epochs)+\
                       '\tTraining Loss: {:.4f}'.format(train_val)+\
-                      '\tTest Loss: {:.4f}'.format(cross_val))
+                      '\tTest Loss: {:.4f}'.format(cross_val)+\
+                       '\tEllapsed time: {:.4f}m'.format(time_epoch))
     
     # Low verbosity final report
     if args.v>=1:
         print('Final training loss: {:.4f}'.format(obj_vals[-1]))
         print('Final test loss: {:.4f}'.format(cross_vals[-1]))
     
-    print('Ellapsed time: {}m'.format( (time()-start_time)/60) )
+    print('Total ellapsed time: {:.4f}m'.format( (time()-start_time)/60) )
     
     # Plot saved in results folder
     fig,ax = plt.subplots()

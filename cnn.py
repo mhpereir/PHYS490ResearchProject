@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as func
 import numpy as np
 
+from time import time
+
 class StarNet(nn.Module):
     '''
     Neural network class.
@@ -27,6 +29,7 @@ class StarNet(nn.Module):
         self.fc2      = nn.Linear(256,128)
         self.fc3      = nn.Linear(128,3)
         
+        self.flag     = True
 
     def init_data(self,data,cuda):
         if cuda:
@@ -56,23 +59,66 @@ class StarNet(nn.Module):
         return out
         
         
-    def backprop(self, loss, optimizer, n_train):
+    def backprop(self, data, loss, optimizer, n_train, device):
         self.train()
         
-        args_batch = np.random.randint(0, len(self.inputs_train)-n_train)
+        n_total   = len(data.x_train[:,0,0])
+        iters     = int(np.floor(n_total/n_train))
+        loss_vals = []
         
-        outputs= self(self.inputs_train[args_batch: args_batch+n_train])        
-        obj_val= loss(outputs, self.targets_train[args_batch: args_batch+n_train])
-        optimizer.zero_grad()
-        obj_val.backward()
-        optimizer.step()
-        return obj_val.item()
+        if self.flag:
+            print('Running #{} iterations per epoch.'.format(iters))
+            self.flag = False
         
-    def cross(self, loss):
-        self.eval()
+        start_time = time()
+        
+        for i in range(iters-1):
+            args_lower = i*n_train 
+            args_upper = (i+1)*n_train
+            
+            
+            inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
+            targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
+            
+            outputs= self(inputs)        
+            obj_val= loss(outputs, targets)
+            
+            optimizer.zero_grad()
+            obj_val.backward()
+            optimizer.step()
+            
+            loss_vals.append(obj_val.item())
+        
+        if n_total % n_train != 0:
+            #final step:    ##account for leftover indices in input array
+            args_lower = (i+1)*n_train 
+            args_upper = n_total - 1
+            
+            
+            inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
+            targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
+            
+            outputs= self(inputs)        
+            obj_val= loss(outputs, targets)
+            
+            optimizer.zero_grad()
+            obj_val.backward()
+            optimizer.step()
+            
+            loss_vals.append(obj_val.item())
+    
+        ellapsed_time = (time() - start_time)/60
+    
+        return np.mean(loss_vals), ellapsed_time
+            
+    def cross(self, data, loss, device):
+        inputs  = torch.from_numpy(data.x_cross[:,:,:]).to(device).float()
+        targets = torch.from_numpy(data.y_cross_norm[:,:]).to(device).float()
+        
         with torch.no_grad():
-            outputs= self(self.inputs_cross)
-            cross_val= loss(outputs, self.targets_cross)  #self.forward(inputs)
+            outputs   = self(inputs)
+            cross_val = loss(outputs, targets)
+            
         return cross_val.item()    
     
         
