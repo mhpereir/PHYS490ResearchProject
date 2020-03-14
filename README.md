@@ -4,7 +4,7 @@ Research project for PHYS 490 course.
 ___
 Paper: https://academic.oup.com/mnras/article/475/3/2978/4775133
 Code : https://github.com/astroai/starnet
-Data : 
+Data : https://www.canfar.net/storage/list/starnet/public
 ---
 
 Authors:
