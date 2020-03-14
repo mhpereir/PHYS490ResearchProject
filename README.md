@@ -3,7 +3,8 @@ Research project for PHYS 490 course.
 
 ___
 Paper: https://academic.oup.com/mnras/article/475/3/2978/4775133
-
+Code : https://github.com/astroai/starnet
+Data : https://www.canfar.net/storage/list/starnet/public
 ---
 
 Authors:
@@ -14,6 +15,7 @@ Authors:
 ## Dependencies
 
 - json
+- time
 - numpy
 - matplotlib
 - argparse
@@ -27,5 +29,5 @@ To run `main.py`, use
 
 
 ```sh
-python3 main.py --train_path=data/training_data.h5 --test_path=data/test_data.h5 --params_path=data/params.json
+python3 main.py --data_path=data --train=real --test=real -o=results -c=1
 ```
