@@ -30,17 +30,17 @@ class StarNet(nn.Module):
 
     def init_data(self,data,cuda):
         if cuda:
-            self.inputs_train  = torch.from_numpy(data.x_train).cuda().double()
-            self.targets_train = torch.from_numpy(data.y_train).cuda().double()
+            self.inputs_train  = torch.from_numpy(data.x_train).cuda().float()
+            self.targets_train = torch.from_numpy(data.y_train_norm).cuda().float()
             
-            self.inputs_test  = torch.from_numpy(data.x_test).cuda().double()
-            self.targets_test = torch.from_numpy(data.y_test).cuda().double()
+            self.inputs_cross  = torch.from_numpy(data.x_cross).cuda().float()
+            self.targets_cross = torch.from_numpy(data.y_cross_norm).cuda().float()
         else:
-            self.inputs_train  = torch.from_numpy(data.x_train).double()
-            self.targets_train = torch.from_numpy(data.y_train).double()
+            self.inputs_train  = torch.from_numpy(data.x_train).float()
+            self.targets_train = torch.from_numpy(data.y_train_norm).float()
 
-            self.inputs_test  = torch.from_numpy(data.x_test).double()
-            self.targets_test = torch.from_numpy(data.y_test).double()
+            self.inputs_cross  = torch.from_numpy(data.x_cross).float()
+            self.targets_cross = torch.from_numpy(data.y_cross_norm).float()
             
             
     def forward(self,x):
@@ -68,11 +68,11 @@ class StarNet(nn.Module):
         optimizer.step()
         return obj_val.item()
         
-    def test(self, loss):
+    def cross(self, loss):
         self.eval()
         with torch.no_grad():
-            outputs= self(self.inputs_test)
-            cross_val= loss(outputs, self.targets_test)  #self.forward(inputs)
+            outputs= self(self.inputs_cross)
+            cross_val= loss(outputs, self.targets_cross)  #self.forward(inputs)
         return cross_val.item()    
     
         
