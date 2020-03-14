@@ -77,12 +77,16 @@ class Data():
                 logg  = np.array(f5['LOGG'], dtype=float)
                 teff  = np.array(f5['TEFF'], dtype=float)
                 spect = np.array(f5['spectrum'], dtype=float)
+                
+                self.snr = np.array(f5['combined_snr'], dtype=float)
             
             elif self.test_flag == 2:
                 fe_h  = np.array(f5['ASSET FE_H test'], dtype=float)
                 logg  = np.array(f5['ASSET LOGG test'], dtype=float)
                 teff  = np.array(f5['ASSET TEFF test'], dtype=float)
                 spect = np.array(f5['ASSET spectrum test'], dtype=float)
+            
+                self.snr = None
             
             n = len(spect[0,:])
             
