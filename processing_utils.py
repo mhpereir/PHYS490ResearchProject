@@ -20,7 +20,7 @@ class post_processing():
         
         self.resids = [Teff_resid, g_resid, Fe_resid]
         self.targets = [target_Teff, target_g, target_Fe]
-        self.target_SN = model_SN[:,3]
+        self.target_SN = model_targets[:,3]
         self.trialname = trialname
         self.respath = respath
         
@@ -59,12 +59,12 @@ class post_processing():
             target = self.targets[i]
             resid = self.resids[i]
             #gen and fit histograms
-            hist = SN_hist(resid, self.target_SN, 200, 100)
-            gauss_out_low = fitGauss(hist[0][1][:-1], hist[0][0])
-            gauss_out_high = fitGauss(hist[1][1][:-1], hist[1][0])
+            hist = self.SN_hist(resid, self.target_SN, 200, 100)
+            gauss_out_low = self.fitGauss(hist[0][1][:-1], hist[0][0])
+            gauss_out_high = self.fitGauss(hist[1][1][:-1], hist[1][0])
             gauss_ran = hist[2]
-            gauss_low = gauss(gauss_ran, gauss_out_low[0], gauss_out_low[1], gauss_out_low[2])
-            gauss_high = gauss(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
+            gauss_low = self.gauss(gauss_ran, gauss_out_low[0], gauss_out_low[1], gauss_out_low[2])
+            gauss_high = self.gauss(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
             ##plot results##
             #plot resid
             plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap)
@@ -77,7 +77,7 @@ class post_processing():
             axs[i, 1].yaxis.tick_right()
         pplt.tight_layout()
         #colorbar
-        fig.colorbar(plot, ax=axs.ravel().tolist(),label='N/S')
+        fig.colorbar(plot, ax=axs.ravel().tolist(),label='S/N')
         #savefig
         pplt.savefig(self.respath + '/' + self.trialname + '.pdf')
         
