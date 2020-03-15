@@ -50,14 +50,29 @@ if __name__ == '__main__':
     
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=param_file['lr'])
-    loss       = torch.nn.MSELoss()
     
+    reduce_lr_factor   = 0.5
+    reduce_lr_patience = 2
+    reduce_lr_min      = 0.00008
+    reduce_lr_epsilon  = 0.0009
+    
+    early_stop_patience = 4
+    early_stop_min_diff = 0.0001
+    
+    optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', 
+                                         factor=reduce_lr_factor, 
+                                         patience=reduce_lr_patience, 
+                                         min_lr=reduce_lr_min, 
+                                         eps=reduce_lr_epsilon,
+                                         verbose=True)
+    loss       = torch.nn.MSELoss()
     
     obj_vals     = []
     cross_vals   = []
     num_epochs   = int(param_file['n_epoch'])
     num_epochs_v = int(param_file['n_epoch_v'])
     n_train      = int(param_file['n_mini_batch'])
+    early_stop_condition = False
     
     if torch.cuda.is_available() and cuda_input == 1:
         device = 'cuda'
@@ -83,6 +98,11 @@ if __name__ == '__main__':
                       '\tTraining Loss: {:.4f}'.format(train_val)+\
                       '\tTest Loss: {:.4f}'.format(cross_val)+\
                        '\tEllapsed time: {:.4f}m'.format(time_epoch))
+    
+        early_stop_condition = model.check_early_stop(cross_vals, patience=early_stop_patience, min_diff=early_stop_min_diff)
+    
+        if early_stop_condition:
+            print('Early stop condition met. \\ Breaking at epoch: {}'.format(epoch))
     
     # Low verbosity final report
     if args.v>=1:

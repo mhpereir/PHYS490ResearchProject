@@ -159,7 +159,23 @@ class StarNet(nn.Module):
         print('Target prediction ellapsed time: {:.4f}m'.format( (time()-start_time)/60) )
         
         return predicted_target_array
+    
+    def check_early_stop(self,loss_test, patience, min_diff):
         
+        if len(loss_test) < 2:
+            self.counter = 0
+        elif loss_test[-1] > loss_test[-2]:
+            self.counter += 1
+        elif loss_test[-1] <= loss_test[-2]:
+            self.counter = 0
+        else:
+            pass
+        
+        if len(loss_test) >= patience:
+            if (self.counter == patience) or abs(loss_test[-1] - loss_test[-2]) <= min_difference:
+                return True
+        
+    
     def reset(self):
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
