@@ -107,7 +107,8 @@ class Data():
         self.y_cross_norm = np.add(self.y_cross,-self.mean_labels)/self.std_labels
         
     def re_normalize_targets(self, trained_targets):
-        self.y_train_renorm = np.add(trained_targets,self.mean_labels)*self.std_labels
+        return np.add(trained_targets*self.std_labels,self.mean_labels)
+        
         
         
             

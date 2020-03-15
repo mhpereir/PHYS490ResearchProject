@@ -2,6 +2,7 @@ import json, argparse, torch
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import torch
+import numpy as np
 
 import torch.nn as nn
 
@@ -105,6 +106,15 @@ if __name__ == '__main__':
     
     data.load_test()
     predicted_targets = model.model_predictions(data, n_train, device)
+    predicted_targets = data.re_normalize_targets(predicted_targets)
+    real_targets = data.y_test
+    snr = data.snr
+    real_targets = np.concatenate((real_targets,snr),axis=1)
     data.close('test')
+    
+    respath = 'results'
+    trialname = 'Trial1'
+    pp = post_processing(predicted_targets, real_targets, respath, trialname)
+    pp.plotResults()
     
     

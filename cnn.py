@@ -72,7 +72,7 @@ class StarNet(nn.Module):
         
         start_time = time()
         
-        for i in range(iters-1):
+        for i in range(iters):
             args_lower = i*n_train 
             args_upper = (i+1)*n_train
             
@@ -92,7 +92,7 @@ class StarNet(nn.Module):
         if n_total % n_train != 0:
             #final step:    ##account for leftover indices in input array
             args_lower = (i+1)*n_train 
-            args_upper = n_total - 1
+            args_upper = n_total
             
             
             inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
@@ -132,7 +132,7 @@ class StarNet(nn.Module):
             
             start_time = time()
             
-            for i in range(iters-1):
+            for i in range(iters):
                 args_lower = i*n_train 
                 args_upper = (i+1)*n_train
                 
@@ -148,7 +148,7 @@ class StarNet(nn.Module):
             if n_total % n_train != 0:
                 #final step:    ##account for leftover indices in input array
                 args_lower = (i+1)*n_train 
-                args_upper = n_total - 1
+                args_upper = n_total
                 
                 
                 inputs  = torch.from_numpy(data.x_test[args_lower:args_upper,:,:]).to(device).float()

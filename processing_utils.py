@@ -25,11 +25,12 @@ class post_processing():
         self.respath = respath
         
     def SN_hist(self, data, data_SN, upper_SN, lower_SN,bins=50):
-        low_SN = data[np.where(data_SN == lower_SN)]
-        high_SN = data[np.where(data_SN == upper_SN)]
+        low_SN = data[np.where(data_SN <= lower_SN)]
+        high_SN = data[np.where(data_SN >= upper_SN)]
         low_SN_hist = np.histogram(low_SN,bins)
         high_SN_hist = np.histogram(high_SN,bins)
         binRange = np.concatenate((low_SN_hist[1],high_SN_hist[1]))
+        binRange = np.linspace(np.min(binRange),np.max(binRange),100)
         return low_SN_hist, high_SN_hist, binRange
         
     def gauss(self, x, a, x0, sigma):
@@ -47,13 +48,13 @@ class post_processing():
         gs_kw = dict(width_ratios=widths)
         fig, axs = pplt.subplots(3, 2, gridspec_kw=gs_kw)
         #plot params
-        s = 3
-        cmap = 'magma'
-        cmap = cm.get_cmap('magma')
+        s = 1
+        cmap = cm.get_cmap('magma_r')
         rgba1 = cmap(0.9)
         rgba2 = cmap(0.1)
         ylabels = ['Teff','log(g)','Fe']
         xlabels = ['Teff','log(g)','Fe']
+        ylims = [1000,2,1]
         #plot
         for i in range(0,3):
             target = self.targets[i]
@@ -67,7 +68,8 @@ class post_processing():
             gauss_high = self.gauss(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
             ##plot results##
             #plot resid
-            plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap)
+            plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap, vmin=50, vmax=250)
+            axs[i, 0].set_ylim(-ylims[i],ylims[i])
             axs[i, 0].set_xlabel(xlabels[i])
             axs[i, 0].set_ylabel(ylabels[i])
             #plot gauss
@@ -75,9 +77,10 @@ class post_processing():
             axs[i, 1].plot(gauss_high, gauss_ran,color=rgba2)
             axs[i, 1].xaxis.set_visible(False)
             axs[i, 1].yaxis.tick_right()
+        
         pplt.tight_layout()
         #colorbar
-        fig.colorbar(plot, ax=axs.ravel().tolist(),label='S/N')
+        cbar = fig.colorbar(plot, ax=axs.ravel().tolist(), label='S/N', extend='both', pad=0.1)
         #savefig
         pplt.savefig(self.respath + '/' + self.trialname + '.pdf')
         
