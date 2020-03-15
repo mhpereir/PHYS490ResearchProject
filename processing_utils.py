@@ -24,11 +24,11 @@ class post_processing():
         self.trialname = trialname
         self.respath = respath
         
-    def SN_hist(self, data, data_SN, upper_SN, lower_SN,bins=50):
+    def SN_hist(self, data, data_SN, upper_SN, lower_SN):
         low_SN = data[np.where(data_SN <= lower_SN)]
         high_SN = data[np.where(data_SN >= upper_SN)]
-        low_SN_hist = np.histogram(low_SN,bins)
-        high_SN_hist = np.histogram(high_SN,bins)
+        low_SN_hist = np.histogram(low_SN)
+        high_SN_hist = np.histogram(high_SN)
         binRange = np.concatenate((low_SN_hist[1],high_SN_hist[1]))
         binRange = np.linspace(np.min(binRange),np.max(binRange),100)
         return low_SN_hist, high_SN_hist, binRange
@@ -50,8 +50,8 @@ class post_processing():
         #plot params
         s = 1
         cmap = cm.get_cmap('magma_r')
-        rgba1 = cmap(0.9)
-        rgba2 = cmap(0.1)
+        rgbahigh = cmap(0.9)
+        rgbalow = cmap(0.1)
         ylabels = ['Teff','log(g)','Fe']
         xlabels = ['Teff','log(g)','Fe']
         ylims = [1000,2,1]
@@ -73,8 +73,8 @@ class post_processing():
             axs[i, 0].set_xlabel(xlabels[i])
             axs[i, 0].set_ylabel(ylabels[i])
             #plot gauss
-            axs[i, 1].plot(gauss_low, gauss_ran,color=rgba1)
-            axs[i, 1].plot(gauss_high, gauss_ran,color=rgba2)
+            axs[i, 1].plot(gauss_low, gauss_ran,color=rgbalow)
+            axs[i, 1].plot(gauss_high, gauss_ran,color=rgbahigh)
             axs[i, 1].xaxis.set_visible(False)
             axs[i, 1].yaxis.tick_right()
         
