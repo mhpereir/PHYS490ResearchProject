@@ -108,9 +108,7 @@ if __name__ == '__main__':
         early_stop_condition = model.check_early_stop(cross_vals, patience=early_stop_patience, min_diff=early_stop_min_diff)
     
         if early_stop_condition:
-
             print('Early stop condition met. Breaking at epoch: {}'.format(epoch))
-
             break
     
     # Low verbosity final report

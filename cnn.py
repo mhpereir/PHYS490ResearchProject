@@ -171,7 +171,6 @@ class StarNet(nn.Module):
         else:
             pass
         
-
         if len(loss_cross) >= patience:
             if (self.counter == patience):
                 return True
