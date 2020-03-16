@@ -33,8 +33,12 @@ class post_processing():
         binRange = np.linspace(np.min(binRange),np.max(binRange),100)
         return low_SN_hist, high_SN_hist, binRange
         
-    def gauss(self, x, a, x0, sigma):
-        return a*np.exp(-(x-x0)**2/(2*sigma**2))
+    def gauss(self, x, a, x0, var):
+        return a*np.exp(-(x-x0)**2/(2*var))
+    
+    def normal(self, x, a, x0, var):
+        return 1./(np.sqrt(2*var*np.pi))*np.exp(-(x-x0)**2/(2*var))
+        
 
     def fitGauss(self, x, y, p0=[1,0,1]):
         popt, pcov = curve_fit(self.gauss,x,y,p0)
@@ -54,27 +58,38 @@ class post_processing():
         rgbalow = cmap(0.1)
         ylabels = ['Teff','log(g)','Fe']
         xlabels = ['Teff','log(g)','Fe']
+        p0s = [(1,0,50**2),(1,0,0.1**2),(1,0,0.05**2)]
         ylims = [1000,2,1]
+        gausslims = [500,1,0.5]
         #plot
         for i in range(0,3):
             target = self.targets[i]
             resid = self.resids[i]
             #gen and fit histograms
             hist = self.SN_hist(resid, self.target_SN, 200, 100)
-            gauss_out_low = self.fitGauss(hist[0][1][:-1], hist[0][0])
-            gauss_out_high = self.fitGauss(hist[1][1][:-1], hist[1][0])
-            gauss_ran = hist[2]
-            gauss_low = self.gauss(gauss_ran, gauss_out_low[0], gauss_out_low[1], gauss_out_low[2])
-            gauss_high = self.gauss(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
             ##plot results##
             #plot resid
             plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap, vmin=50, vmax=250)
+            axs[i, 0].plot(np.linspace(np.min(target)*0.9,np.max(target)*1.1,10), np.zeros(10),'k',linewidth=0.5)
+            axs[i, 0].set_xlim(np.min(target)*0.9,np.max(target)*1.1)
             axs[i, 0].set_ylim(-ylims[i],ylims[i])
             axs[i, 0].set_xlabel(xlabels[i])
             axs[i, 0].set_ylabel(ylabels[i])
-            #plot gauss
-            axs[i, 1].plot(gauss_low, gauss_ran,color=rgbalow)
-            axs[i, 1].plot(gauss_high, gauss_ran,color=rgbahigh)
+            try:
+                gauss_out_low = self.fitGauss(hist[0][1][:-1], hist[0][0]/np.max(hist[0][0]), p0s[i])
+                gauss_out_high = self.fitGauss(hist[1][1][:-1], hist[1][0]/np.max(hist[1][0]), p0s[i])
+                gauss_ran = np.linspace(-gausslims[i],gausslims[i],100)
+                gauss_low = self.normal(gauss_ran, gauss_out_low[0], gauss_out_low[1], gauss_out_low[2])
+                gauss_high = self.normal(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
+                #plot gauss
+                axs[i, 1].plot(gauss_low, gauss_ran,color=rgbalow)
+                axs[i, 1].plot(gauss_high, gauss_ran,color=rgbahigh,alpha=0.8)
+                axs[i, 1].set_ylim(-gausslims[i],gausslims[i])
+            except Exception as e:
+                print(e)
+                #plot histogram
+                axs[i, 1].plot(hist[0][0],hist[0][1][:-1],color=rgbalow)
+                axs[i, 1].plot(hist[1][0],hist[1][1][:-1],color=rgbahigh)
             axs[i, 1].xaxis.set_visible(False)
             axs[i, 1].yaxis.tick_right()
         

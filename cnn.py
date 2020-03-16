@@ -164,7 +164,7 @@ class StarNet(nn.Module):
         
         if len(loss_test) < 2:
             self.counter = 0
-        elif loss_test[-1] > loss_test[-2]:
+        elif (loss_test[-1] > loss_test[-2]) or (abs(loss_test[-1] - loss_test[-2]) <= min_diff):
             self.counter += 1
         elif loss_test[-1] <= loss_test[-2]:
             self.counter = 0
@@ -172,7 +172,7 @@ class StarNet(nn.Module):
             pass
         
         if len(loss_test) >= patience:
-            if (self.counter == patience) or abs(loss_test[-1] - loss_test[-2]) <= min_difference:
+            if (self.counter == patience):
                 return True
         
     

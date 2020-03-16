@@ -103,6 +103,7 @@ if __name__ == '__main__':
     
         if early_stop_condition:
             print('Early stop condition met. \\ Breaking at epoch: {}'.format(epoch))
+            break
     
     # Low verbosity final report
     if args.v>=1:
@@ -113,8 +114,8 @@ if __name__ == '__main__':
     
     # Plot saved in results folder
     fig,ax = plt.subplots()
-    ax.plot(range(num_epochs), obj_vals, label= "Training loss", color="blue")
-    ax.plot(range(num_epochs), cross_vals, label= "Test loss", color= "green")
+    ax.plot(range(epoch), obj_vals, label= "Training loss", color="blue")
+    ax.plot(range(epoch), cross_vals, label= "Test loss", color= "green")
     ax.legend()
     fig.savefig('results/loss.pdf')
     plt.close()
