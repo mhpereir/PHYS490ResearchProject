@@ -51,22 +51,25 @@ if __name__ == '__main__':
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=param_file['lr'])
     
-    reduce_lr_factor   = 0.5
-    reduce_lr_patience = 2
-    reduce_lr_min      = 0.00008
-    reduce_lr_epsilon  = 0.0009
+    reduce_lr_factor         = 0.5
+    reduce_lr_patience       = 2
+    reduce_lr_min            = 0.00008
+    reduce_lr_threshold      = 0.0009        #assuming this is the same as reduce_lr_epsilon in original code....???? 
+    reduce_lr_threshold_mode = 'abs'
     
     early_stop_patience = 4
     early_stop_min_diff = 0.0001
     
-    optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', 
-                                         factor=reduce_lr_factor, 
-                                         patience=reduce_lr_patience, 
-                                         min_lr=reduce_lr_min, 
-                                         eps=reduce_lr_epsilon,
-                                         verbose=True)
+    scheduler  = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', 
+                                                    factor=reduce_lr_factor, 
+                                                    patience=reduce_lr_patience, 
+                                                    min_lr=reduce_lr_min, 
+                                                    #eps=reduce_lr_epsilon,
+                                                    threshold=reduce_lr_threshold,
+                                                    threshold_mode=reduce_lr_threshold_mode,
+                                                    verbose=True)
     loss       = torch.nn.MSELoss()
-    
+        
     obj_vals     = []
     cross_vals   = []
     num_epochs   = int(param_file['n_epoch'])
@@ -88,8 +91,11 @@ if __name__ == '__main__':
         train_val,time_epoch = model.backprop(data, loss, optimizer, n_train, device)
         obj_vals.append(train_val)
         
+        
         cross_val = model.cross(data, loss, device)
         cross_vals.append(cross_val)
+        
+        scheduler.step(train_val)
         
         # High verbosity report in output stream
         if args.v>=2:
@@ -102,7 +108,9 @@ if __name__ == '__main__':
         early_stop_condition = model.check_early_stop(cross_vals, patience=early_stop_patience, min_diff=early_stop_min_diff)
     
         if early_stop_condition:
-            print('Early stop condition met. \\ Breaking at epoch: {}'.format(epoch))
+
+            print('Early stop condition met. Breaking at epoch: {}'.format(epoch))
+
             break
     
     # Low verbosity final report

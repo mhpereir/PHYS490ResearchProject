@@ -160,21 +160,23 @@ class StarNet(nn.Module):
         
         return predicted_target_array
     
-    def check_early_stop(self,loss_test, patience, min_diff):
+    def check_early_stop(self,loss_cross, patience, min_diff):
         
-        if len(loss_test) < 2:
+        if len(loss_cross) < 2:
             self.counter = 0
-        elif (loss_test[-1] > loss_test[-2]) or (abs(loss_test[-1] - loss_test[-2]) <= min_diff):
+        elif loss_cross[-1] > loss_cross[-2] or abs(loss_cross[-1] - loss_cross[-2]) <= min_diff:
             self.counter += 1
-        elif loss_test[-1] <= loss_test[-2]:
+        elif loss_cross[-1] <= loss_cross[-2]:
             self.counter = 0
         else:
             pass
         
-        if len(loss_test) >= patience:
+
+        if len(loss_cross) >= patience:
             if (self.counter == patience):
                 return True
         
+    
     
     def reset(self):
         self.conv1.reset_parameters()
