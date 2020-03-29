@@ -20,14 +20,14 @@ def get_args():
         description='STARNET: CNN regressor to predict solar properties from stellar spectra',
         allow_abbrev=True)
 
-    parser.add_argument('-d', '--data_path', type=str, metavar='path',
+    parser.add_argument('-d', '--data_path', type=str, metavar='path/to/data',
         required=True, help='Path to directory containing all datasets and hyperparameter files')
-    parser.add_argument('--train', type=str, metavar='str', required=True,
-        help='Which training dataset to use: real or synthetic?')
-    parser.add_argument('--test', type=str, metavar='str', required=True,
-        help='Which testing dataset to use: real or synthetic?')
-    parser.add_argument('-o', '--output_path', type=str, metavar='results',
-        default='results/', required=True, help='Path to store plots and results')
+    parser.add_argument('--train', required=True, choices=['real', 'synthetic'],
+        type=str, help='Which training dataset to use: real or synthetic?')
+    parser.add_argument('--test', required=True, choices=['real', 'synthetic'],
+        type=str, help='Which testing dataset to use: real or synthetic?')
+    parser.add_argument('-o', '--output_path', type=str, metavar='path/to/results',
+        default='results/', help='Path to store plots and results')
     parser.add_argument('-v', '--verbose', type=bool, default=False, metavar='True',
         help='Boolean flag to specify verbose output (default: False)')
     parser.add_argument('-c', '--cuda', type=bool, default=False, metavar='True',
@@ -36,7 +36,7 @@ def get_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def run_main():
     # start_time = time()
 
     args = get_args()
@@ -48,10 +48,13 @@ if __name__ == '__main__':
     verb             = args.verbose
     cuda_input       = args.cuda
 
-    params_path = os.path.join(data_path, 'params.json')  #str(data_file_path) + '/params.json'
-
+    # Load hyperparameters from file
+    params_path = os.path.join(data_path, 'params.json')
     with open(params_path) as paramfile:
         params = json.load(paramfile)
+    num_epochs   = int(params['n_epoch'])
+    num_epochs_v = int(params['n_epoch_v'])
+    n_train      = int(params['n_mini_batch'])
 
     # Load in the training datasets
     # REVIEW data utils
@@ -86,9 +89,6 @@ if __name__ == '__main__':
 
     obj_vals     = []
     cross_vals   = []
-    num_epochs   = int(params['n_epoch'])
-    num_epochs_v = int(params['n_epoch_v'])
-    n_train      = int(params['n_mini_batch'])
     early_stop_condition = False
 
     if torch.cuda.is_available() and cuda_input == 1:
@@ -159,3 +159,7 @@ if __name__ == '__main__':
     trialname = 'Trial1'
     pp = post_processing(predicted_targets, real_targets, respath, trialname)
     pp.plotResults()
+
+
+if __name__ == '__main__':
+    run_main()
