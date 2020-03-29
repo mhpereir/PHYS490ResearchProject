@@ -39,10 +39,14 @@ class post_processing():
     def normal(self, x, a, x0, var):
         return 1./(np.sqrt(2*var*np.pi))*np.exp(-(x-x0)**2/(2*var))
         
-
     def fitGauss(self, x, y, p0=[1,0,1]):
         popt, pcov = curve_fit(self.gauss,x,y,p0)
         return popt
+    
+    def stats(self,y):
+        median = np.median(y)
+        std_dev = np.sqrt(np.sum((y**2))/(len(y)-1))
+        return median, std_dev
 
     def plotResults(self):
         #set fontsize
@@ -56,25 +60,35 @@ class post_processing():
         cmap = cm.get_cmap('magma_r')
         rgbahigh = cmap(0.9)
         rgbalow = cmap(0.1)
-        ylabels = ['Teff','log(g)','Fe']
+        ylabels = [r'$\Delta $Teff',r'$\Delta $log(g)',r'$\Delta $Fe']
         xlabels = ['Teff','log(g)','Fe']
         p0s = [(1,0,50**2),(1,0,0.1**2),(1,0,0.05**2)]
+        xlims_real = [(3750,5750),(0,4.5),(-2.5,0.75)]
+        xlims_synth = [(3500,8500),(-0.5,5.5),(-2.75,0.75)]
+        #set right xlim
+        if np.max(self.targets[1]) <= 6000:
+            xlims = xlims_real
+        else:
+            xlims = xlims_synth
         ylims = [1000,2,1]
-        gausslims = [500,1,0.5]
+        gausslims = [200,0.4,0.2]
         #plot
         for i in range(0,3):
             target = self.targets[i]
             resid = self.resids[i]
+            #mean and scatter
+            median, scatter = self.stats(resid)
             #gen and fit histograms
             hist = self.SN_hist(resid, self.target_SN, 200, 100)
             ##plot results##
             #plot resid
             plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap, vmin=50, vmax=250)
-            axs[i, 0].plot(np.linspace(np.min(target)*0.9,np.max(target)*1.1,10), np.zeros(10),'k',linewidth=0.5)
-            axs[i, 0].set_xlim(np.min(target)*0.9,np.max(target)*1.1)
+            axs[i, 0].plot(np.linspace(xlims[i][0],xlims[i][1],10), np.zeros(10),'k',linewidth=0.5)
             axs[i, 0].set_ylim(-ylims[i],ylims[i])
             axs[i, 0].set_xlabel(xlabels[i])
             axs[i, 0].set_ylabel(ylabels[i])
+            axs[i, 0].set_xlim(xlims[i][0],xlims[i][1])
+            axs[i, 0].annotate(s=r'$\~m={:.3f}$   $s={:.3f}$'.format(median,scatter),xy=(xlims[i][0],-(ylims[i]*0.9)))
             try:
                 gauss_out_low = self.fitGauss(hist[0][1][:-1], hist[0][0]/np.max(hist[0][0]), p0s[i])
                 gauss_out_high = self.fitGauss(hist[1][1][:-1], hist[1][0]/np.max(hist[1][0]), p0s[i])
@@ -82,8 +96,8 @@ class post_processing():
                 gauss_low = self.normal(gauss_ran, gauss_out_low[0], gauss_out_low[1], gauss_out_low[2])
                 gauss_high = self.normal(gauss_ran, gauss_out_high[0], gauss_out_high[1], gauss_out_high[2])
                 #plot gauss
-                axs[i, 1].plot(gauss_low, gauss_ran,color=rgbalow)
-                axs[i, 1].plot(gauss_high, gauss_ran,color=rgbahigh,alpha=0.8)
+                axs[i, 1].plot(gauss_high, gauss_ran,color=rgbahigh,alpha=0.7)
+                axs[i, 1].plot(gauss_low, gauss_ran,color=rgbalow,alpha=0.7)
                 axs[i, 1].set_ylim(-gausslims[i],gausslims[i])
             except Exception as e:
                 print(e)
@@ -97,6 +111,6 @@ class post_processing():
         #colorbar
         cbar = fig.colorbar(plot, ax=axs.ravel().tolist(), label='S/N', extend='both', pad=0.1)
         #savefig
-        pplt.savefig(self.respath + '/' + self.trialname + '.pdf')
+        pplt.savefig(self.respath + '/' + self.trialname + '.png')
         
     
