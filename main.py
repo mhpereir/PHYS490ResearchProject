@@ -123,7 +123,7 @@ if __name__ == '__main__':
     ax.plot(range(epoch), obj_vals, label= "Training loss", color="blue")
     ax.plot(range(epoch), cross_vals, label= "Test loss", color= "green")
     ax.legend()
-    fig.savefig('results/loss.pdf')
+    fig.savefig('results/loss.png')
     plt.close()
     
 

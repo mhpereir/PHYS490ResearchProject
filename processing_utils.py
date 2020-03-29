@@ -60,7 +60,7 @@ class post_processing():
         cmap = cm.get_cmap('magma_r')
         rgbahigh = cmap(0.9)
         rgbalow = cmap(0.1)
-        ylabels = ['Teff','log(g)','Fe']
+        ylabels = [r'$\Delta $Teff',r'$\Delta $log(g)',r'$\Delta $Fe']
         xlabels = ['Teff','log(g)','Fe']
         p0s = [(1,0,50**2),(1,0,0.1**2),(1,0,0.05**2)]
         xlims_real = [(3750,5750),(0,4.5),(-2.5,0.75)]
@@ -111,6 +111,6 @@ class post_processing():
         #colorbar
         cbar = fig.colorbar(plot, ax=axs.ravel().tolist(), label='S/N', extend='both', pad=0.1)
         #savefig
-        pplt.savefig(self.respath + '/' + self.trialname + '.pdf')
+        pplt.savefig(self.respath + '/' + self.trialname + '.png')
         
     
