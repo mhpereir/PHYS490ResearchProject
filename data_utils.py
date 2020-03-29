@@ -30,8 +30,47 @@ class Data():
             self.test_flag = 2
         else:
             print('Input for either --test is not recognized. \\Expecting "real" or "synth".')
-        
     
+        self.find_normalize()
+    
+    def find_normalize(self):
+        
+        with h5py.File(self.train_file_name, 'r') as f5:
+            
+            if self.train_flag == 1:
+                fe_h  = np.array(f5['FE_H'], dtype=float)
+                logg  = np.array(f5['LOGG'], dtype=float)
+                teff  = np.array(f5['TEFF'], dtype=float)
+            
+                y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
+                
+                self.mean_labels = np.mean(y_train, axis=0)
+                self.std_labels  = np.std(y_train, axis=0)
+                
+                fe_h    = None
+                logg    = None
+                teff    = None
+                y_train = None
+                
+            elif self.train_flag == 2:
+            
+                mean_list = []
+                std_list  = []
+            
+                for var in ['FE_H', 'LOGG', 'TEFF']:
+                    
+                    array = np.array(f5['ASSET {} train'.format(var)], dtype=float)
+                    
+                    mean_list.append(np.mean(array))
+                    std_list.append(np.std(array))
+                    
+                self.mean_labels = np.array(mean_list)
+                self.std_labels  = np.array(std_list)
+                
+                mean_list = None
+                std_list  = None
+                
+            
     def load_train(self, n_rank):
         with h5py.File(self.train_file_name, 'r') as f5:            
             
@@ -101,7 +140,7 @@ class Data():
                 teff  = None
                 spect = None
             
-        self.normalize_targets()        # issue in how this is being done for ASSET dataset.......
+        self.normalize_targets() 
     
     def close(self, which):
         if which == 'train':
@@ -143,10 +182,7 @@ class Data():
             spect = None
             
             
-    def normalize_targets(self):
-        self.mean_labels = np.mean(self.y_train, axis=0)
-        self.std_labels  = np.std(self.y_train, axis=0)
-        
+    def normalize_targets(self):       
         self.y_train_norm = np.add(self.y_train,-self.mean_labels)/self.std_labels
         self.y_cross_norm = np.add(self.y_cross,-self.mean_labels)/self.std_labels
         
