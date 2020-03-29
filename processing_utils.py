@@ -111,6 +111,6 @@ class post_processing():
         #colorbar
         cbar = fig.colorbar(plot, ax=axs.ravel().tolist(), label='S/N', extend='both', pad=0.1)
         #savefig
-        pplt.savefig(self.respath + '/' + self.trialname + '.png')
+        pplt.savefig(self.respath + '/' + self.trialname + '.png', dpi=220)
         
     
