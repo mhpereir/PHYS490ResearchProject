@@ -29,8 +29,6 @@ class StarNet(nn.Module):
         self.fc2      = nn.Linear(256,128)
         self.fc3      = nn.Linear(128,3)
         
-        self.flag     = True
-
     def init_data(self,data,cuda):
         if cuda:
             self.inputs_train  = torch.from_numpy(data.x_train).cuda().float()
@@ -61,51 +59,52 @@ class StarNet(nn.Module):
         
     def backprop(self, data, loss, optimizer, n_train, device):
         self.train()
-        
-        n_total   = len(data.x_train[:,0,0])
-        iters     = int(np.floor(n_total/n_train))
         loss_vals = []
-        
-        if self.flag:
-            print('Running #{} iterations per epoch.'.format(iters))
-            self.flag = False
-        
+                
         start_time = time()
         
-        for i in range(iters):
-            args_lower = i*n_train 
-            args_upper = (i+1)*n_train
+        for n in range(0,data.n_rank_max_train):
             
+            print('Rank: [{}/{}]'.format(n+1, data.n_rank_max_train))
             
-            inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
-            targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
+            data.load_train(n)
+            n_total   = len(data.x_train[:,0,0])
+            iters     = int(np.floor(n_total/n_train))
             
-            outputs= self(inputs)        
-            obj_val= loss(outputs, targets)
+            for i in range(iters):
+                args_lower = i*n_train 
+                args_upper = (i+1)*n_train
+                
+                
+                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
+                targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
+                
+                outputs = self(inputs)        
+                obj_val = loss(outputs, targets)
+                
+                optimizer.zero_grad()
+                obj_val.backward()
+                optimizer.step()
+                
+                loss_vals.append(obj_val.item())
             
-            optimizer.zero_grad()
-            obj_val.backward()
-            optimizer.step()
-            
-            loss_vals.append(obj_val.item())
-        
-        if n_total % n_train != 0:
-            #final step:    ##account for leftover indices in input array
-            args_lower = (i+1)*n_train 
-            args_upper = n_total
-            
-            
-            inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
-            targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
-            
-            outputs= self(inputs)        
-            obj_val= loss(outputs, targets)
-            
-            optimizer.zero_grad()
-            obj_val.backward()
-            optimizer.step()
-            
-            loss_vals.append(obj_val.item())
+            if n_total % n_train != 0:
+                #final step:    ##account for leftover indices in input array
+                args_lower = (i+1)*n_train 
+                args_upper = n_total
+                
+                
+                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper,:,:]).to(device).float()
+                targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper,:]).to(device).float()
+                
+                outputs = self(inputs)        
+                obj_val = loss(outputs, targets)
+                
+                optimizer.zero_grad()
+                obj_val.backward()
+                optimizer.step()
+                
+                loss_vals.append(obj_val.item())
     
         ellapsed_time = (time() - start_time)/60
     

@@ -2,4 +2,5 @@
 *.pyc
 *.h5
 *.npy
+*.pdf
 /__pycache__/

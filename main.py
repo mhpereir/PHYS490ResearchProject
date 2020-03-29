@@ -41,9 +41,11 @@ if __name__ == '__main__':
     with open(params_file_path) as paramfile:
         param_file = json.load(paramfile)
     
+    n_rank_max = param_file['n_rank']
+    n_cross    = param_file['n_cross']
+    
     # Load in the training datasets
-    data  = Data(data_file_path, train_data, test_data)
-    data.load_train(param_file['n_cross'])
+    data  = Data(data_file_path, train_data, test_data, n_rank_max, n_cross)
     
     # Initialize the model
     model = StarNet().float()
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     fig.savefig('results/loss.pdf')
     plt.close()
     
-
+    
     data.close('train')
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     ## beginning of post processing 
