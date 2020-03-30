@@ -54,8 +54,8 @@ def run_main():
     num_epochs   = int(params['n_epoch'])
     num_epochs_v = int(params['n_epoch_v'])
     n_train      = int(params['n_mini_batch'])
-    n_rank_max   = param_file['n_rank']
-    n_cross      = param_file['n_cross']
+    n_rank_max   = int(params['n_rank'])
+    n_cross      = int(params['n_cross'])
 
     # Load in the training datasets
     data  = Data(data_file_path, train_data, test_data, n_rank_max, n_cross)
