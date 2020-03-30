@@ -32,7 +32,7 @@ class StarNet(nn.Module):
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 3)
 
-    def init_data(self, data, cuda):
+    def init_data(self, data, device):
         self.inputs_train = torch.from_numpy(data.x_train).float().to(device)
         self.targets_train = torch.from_numpy(
             data.y_train_norm).float().to(device)
