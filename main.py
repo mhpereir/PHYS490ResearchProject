@@ -58,7 +58,7 @@ def run_main():
     n_cross      = int(params['n_cross'])
 
     # Load in the training datasets
-    data  = Data(data_file_path, train_data, test_data, n_rank_max, n_cross)
+    data  = Data(data_path, train_data, test_data, n_rank_max, n_cross)
 
     # CUDA usage
     device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
