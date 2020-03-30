@@ -9,7 +9,6 @@ class Data():
         self.test_flag  = 0
         self.n_cross    = int(n_cross)
         self.n_rank_max_train = int(n_rank_max)
-        self.n_rank_max_test  = int(n_rank_max)
         
         if train == 'real' or train == 'r':
             self.train_file_name  = data_file_path + '/training_data.h5'
@@ -24,7 +23,6 @@ class Data():
         if test == 'real' or test == 'r':
             self.test_file_name  = data_file_path + '/test_data.h5'
             self.test_flag       = 1
-            self.n_rank_max_test = 1
         elif test == 'synth' or test == 's':
             self.test_file_name = data_file_path + '/ASSET.h5'
             self.test_flag = 2
