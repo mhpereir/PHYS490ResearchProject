@@ -66,7 +66,7 @@ def run_main():
     # Initialize the model
     # REVIEW cnn
     model = StarNet().float()
-    model.to(device)
+    model.init_data(data, device)
 
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=params['lr'])
@@ -151,12 +151,11 @@ def run_main():
     predicted_targets = data.re_normalize_targets(predicted_targets)
     real_targets = data.y_test
     snr = data.snr
-    real_targets = np.concatenate((real_targets, snr),axis=1)
+    real_targets = np.concatenate((real_targets, snr), axis=1)
     data.close('test')
 
-    respath = 'results'
     trialname = 'Trial1'
-    pp = post_processing(predicted_targets, real_targets, respath, trialname)
+    pp = post_processing(predicted_targets, real_targets, output_path, trialname)
     pp.plotResults()
 
 
