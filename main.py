@@ -32,6 +32,11 @@ def get_args():
         help='Boolean flag to specify verbose output (default: False)')
     parser.add_argument('-c', '--cuda', type=bool, default=False, metavar='True',
         help='Boolean flag to specify to use CUDA (default: False)')
+    parser.add_argument('-m', '--max_cpu', type=bool, default=False, metavar='True',
+        help='Boolean flag to specify whether to use all CPU cores if CUDA is not \
+        in use or is unavailable. Note that this will restrict other system processes \
+        from running. Recommended to only enable on servers. (default: False, \
+        leaves two cores free for other processes)')
 
     return parser.parse_args()
 
@@ -46,6 +51,7 @@ def run_main():
     output_path      = args.output_path
     verbose          = args.verbose
     cuda_input       = args.cuda
+    max_cpu          = args.max_cpu
 
     # Load hyperparameters from file
     params_path = os.path.join(data_path, 'params.json')
@@ -69,7 +75,10 @@ def run_main():
     # model.init_data(data, device)
     model.to(device)
     if device == 'cpu':
-        num_processes = os.cpu_count() if os.cpu_count() > 4 else torch.get_num_threads()
+        if max_cpu and os.cpu_count > 4:  # Maximize the CPU
+            num_processes = os.cpu_count()
+        else:  # Preserve the CPU for other activities
+            num_processes = torch.get_num_threads()
         torch.set_num_threads(num_processes)  # Naive maximization of CPU usage
 
     # Define an optimizer and the loss function
