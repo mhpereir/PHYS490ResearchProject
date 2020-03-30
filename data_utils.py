@@ -210,7 +210,7 @@ class Data():
         #Pnoise = Psignal/SNR
         for i in range(0,len(SNR)):
             Pnoise = Psignal[i]/SNR[i]
-            noise = np.random.normal(0,Pnoise,n) #n = len of spectra 
+            noise = np.random.normal(0,np.sqrt(Pnoise),n) #n = len of spectra 
             spec[i] = np.copy(spec[i]) + noise
         
         
