@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as pplt
-from matplotlib import gridspec, cm
+from matplotlib import gridspec, cm, colors
 from scipy.optimize import curve_fit
 
 class post_processing():
@@ -57,16 +57,18 @@ class post_processing():
         fig, axs = pplt.subplots(3, 2, gridspec_kw=gs_kw)
         #plot params
         s = 1
-        cmap = cm.get_cmap('magma_r')
-        rgbahigh = cmap(0.9)
-        rgbalow = cmap(0.1)
+        cmap = cm.get_cmap('bone_r')#'inferno_r'
+        new_cmap = colors.LinearSegmentedColormap.from_list('trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=0.2, b=1.0),cmap(np.linspace(0.2, 1.0, 100)))
+        
+        rgbahigh = new_cmap(0.9)
+        rgbalow = new_cmap(0.1)
         ylabels = [r'$\Delta $Teff',r'$\Delta $log(g)',r'$\Delta $Fe']
         xlabels = ['Teff','log(g)','Fe']
         p0s = [(1,0,50**2),(1,0,0.1**2),(1,0,0.05**2)]
         xlims_real = [(3750,5750),(0,4.5),(-2.5,0.75)]
-        xlims_synth = [(3500,8500),(-0.5,5.5),(-2.75,0.75)]
+        xlims_synth = [(3000,6500),(-0.5,5.5),(-2.75,0.75)] #old vals (3500,8500),(-0.5,5.5),(-2.75,0.75)
         #set right xlim
-        if np.max(self.targets[1]) <= 6000:
+        if np.max(self.targets[0]) <= 5500:
             xlims = xlims_real
         else:
             xlims = xlims_synth
@@ -82,7 +84,7 @@ class post_processing():
             hist = self.SN_hist(resid, self.target_SN, 200, 100)
             ##plot results##
             #plot resid
-            plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=cmap, vmin=50, vmax=250)
+            plot = axs[i, 0].scatter(target, resid, c=self.target_SN, s=s, cmap=new_cmap, vmin=0, vmax=250,alpha=0.4)
             axs[i, 0].plot(np.linspace(xlims[i][0],xlims[i][1],10), np.zeros(10),'k',linewidth=0.5)
             axs[i, 0].set_ylim(-ylims[i],ylims[i])
             axs[i, 0].set_xlabel(xlabels[i])
@@ -110,6 +112,8 @@ class post_processing():
         pplt.tight_layout()
         #colorbar
         cbar = fig.colorbar(plot, ax=axs.ravel().tolist(), label='S/N', extend='both', pad=0.1)
+        cbar.set_alpha(1)
+        cbar.draw_all()
         #savefig
         pplt.savefig(self.respath + '/' + self.trialname + '.png', dpi=220)
         

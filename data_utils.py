@@ -121,6 +121,10 @@ class Data():
                 self.x_train = spect.reshape(-1,1,n)
                 self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
                 
+                #generate SNR and add to spectra
+                SNRs = np.random.randint(20,250,np.shape(self.x_train)[0])
+                self.add_SNR(SNRs,self.x_train,n)
+                
                 if n_rank == 0: #loading in cross
                     fe_h  = np.array(f5['ASSET FE_H train'][0:self.n_cross,:], dtype=float)
                     logg  = np.array(f5['ASSET LOGG train'][0:self.n_cross,:], dtype=float)
@@ -131,12 +135,17 @@ class Data():
                     
                     self.x_cross = spect.reshape(-1,1,n)
                     self.y_cross = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
+                    
+                    #generate SNR and add to spectra
+                    SNRs = np.random.randint(20,250,np.shape(self.x_cross)[0])
+                    self.add_SNR(SNRs,self.x_cross,n)
                 
                 
                 fe_h  = None
                 logg  = None
                 teff  = None
                 spect = None
+                SNRs  = None
             
         self.normalize_targets() 
     
@@ -160,18 +169,25 @@ class Data():
                 spect = np.array(f5['spectrum'], dtype=float)
                 
                 self.snr = np.array(f5['combined_snr'], dtype=float)
+                
+                n = len(spect[0,:])
+                self.x_test = spect.reshape(-1,1,n)[:,:,:]
             
             elif self.test_flag == 2:
                 fe_h  = np.array(f5['ASSET FE_H test'], dtype=float)
                 logg  = np.array(f5['ASSET LOGG test'], dtype=float)
                 teff  = np.array(f5['ASSET TEFF test'], dtype=float)
                 spect = np.array(f5['ASSET spectrum test'], dtype=float)
+                
+                n = len(spect[0,:])
+                self.x_test = spect.reshape(-1,1,n)[:,:,:]
             
-                self.snr = np.linspace(10,300,len(fe_h)).reshape(-1,1)
+                #generate SNR and add to spectra
+                SNRs = np.random.randint(20,250,np.shape(self.x_test)[0])
+                self.add_SNR(SNRs,self.x_test,n)
+                self.snr = SNRs.reshape(-1,1)
             
-            n = len(spect[0,:])
-            
-            self.x_test = spect.reshape(-1,1,n)[:,:,:]
+
             self.y_test = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)[:,:]
             
             fe_h  = None
@@ -186,7 +202,12 @@ class Data():
         
     def re_normalize_targets(self, trained_targets):
         return np.add(trained_targets*self.std_labels,self.mean_labels)
+    
+    def add_SNR(self,SNR,spec,n):
+        Psignal = np.mean(spec,axis=2)[:,0]
+        #Pnoise = Psignal/SNR
+        for i in range(0,len(SNR)):
+            Pnoise = Psignal[i]/SNR[i]
+            noise = np.random.normal(0,np.sqrt(Pnoise),n) #n = len of spectra 
+            spec[i] = np.copy(spec[i]) + noise
         
-        
-        
-            
