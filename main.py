@@ -69,6 +69,9 @@ def run_main():
     model = StarNet().float()
     model.init_data(data, device)
     model.to(device)
+    if device == 'cpu':
+        num_processes = os.cpu_count() if os.cpu_count() > 4 else torch.get_num_threads()
+        torch.set_num_threads(num_processes)  # Naive maximization of CPU usage
 
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=params['lr'])
@@ -132,8 +135,8 @@ def run_main():
     print('Final test loss: {:.4f}'.format(cross_vals[-1]))
 
     # Plot loss and save to file
-    plt.plot(range(1, epoch), obj_vals, label= 'Training loss', color='blue')
-    plt.plot(range(1, epoch), cross_vals, label= 'CV loss', color= 'green')
+    plt.plot(range(1, epoch+1), obj_vals, label= 'Training loss', color='blue')
+    plt.plot(range(1, epoch+1), cross_vals, label= 'CV loss', color= 'green')
     plt.title('Cross-Validation Loss over %i Training Epochs' % epochs)
     plt.ylabel('Loss')
     plt.xlabel('Epochs')
