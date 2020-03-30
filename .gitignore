@@ -9,6 +9,7 @@ __pycache__/
 # Data files
 *.h5
 *.npy
+*.txt
 
 # Distribution / packaging
 .Python
