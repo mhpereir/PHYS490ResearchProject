@@ -33,10 +33,10 @@ def get_args():
     parser.add_argument('-c', '--cuda', type=bool, default=False, metavar='True',
         help='Boolean flag to specify to use CUDA (default: False)')
     parser.add_argument('-m', '--max_cpu', type=bool, default=False, metavar='True',
-        help='Boolean flag to specify whether to use all CPU cores if CUDA is not \
+        help="Boolean flag to specify whether to use all CPU cores if CUDA is not \
         in use or is unavailable. Note that this will restrict other system processes \
         from running. Recommended to only enable on servers. (default: False, \
-        leaves two cores free for other processes)')
+        resorts to using PyTorch's get_num_threads implementation)")
 
     return parser.parse_args()
 
