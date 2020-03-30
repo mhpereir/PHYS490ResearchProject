@@ -54,8 +54,6 @@ class StarNet(nn.Module):
     def backprop(self, data, loss, optimizer, n_train, device, flag):
         self.train()
 
-        n_total = len(self.inputs_train[:, 0, 0])
-        iters = int(n_total // n_train)
         loss_vals = []
 
         start_time = time()
@@ -65,8 +63,12 @@ class StarNet(nn.Module):
             print('Rank: [{}/{}]'.format(n+1, data.n_rank_max_train))
             if flag:
                 data.load_train(n)
+                self.init_data(data, device)
             else:
                 pass
+
+            n_total = len(self.inputs_train[:, 0, 0])
+            iters = int(n_total // n_train)
 
             for i in range(iters):
                 args_lower = i*n_train

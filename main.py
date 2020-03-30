@@ -66,7 +66,7 @@ def run_main():
 
     # Initialize the model
     model = StarNet().float()
-    model.init_data(data, device)
+    # model.init_data(data, device)
     model.to(device)
     if device == 'cpu':
         num_processes = os.cpu_count() if os.cpu_count() > 4 else torch.get_num_threads()
