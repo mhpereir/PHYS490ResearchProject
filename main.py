@@ -36,7 +36,8 @@ def get_args():
         help="Boolean flag to specify whether to use all CPU cores if CUDA is not \
         in use or is unavailable. Note that this will restrict other system processes \
         from running. Recommended to only enable on servers. (default: False, \
-        resorts to using PyTorch's get_num_threads implementation)")
+        resorts to using PyTorch's get_num_threads implementation, which usually \
+        maximizes use across 50%% of cores)")
 
     return parser.parse_args()
 
