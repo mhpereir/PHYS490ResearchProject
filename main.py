@@ -139,7 +139,7 @@ def run_main():
     # Plot loss and save to file
     plt.plot(range(1, epoch+1), obj_vals, label= 'Training loss', color='blue')
     plt.plot(range(1, epoch+1), cross_vals, label= 'CV loss', color= 'green')
-    plt.title('Cross-Validation Loss over %i Training Epochs' % epochs)
+    plt.title('Cross-Validation Loss over %i Training Epochs' % num_epochs)
     plt.ylabel('Loss')
     plt.xlabel('Epochs')
     plt.legend()
