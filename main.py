@@ -3,6 +3,7 @@
 
 import json, argparse, torch, os
 import numpy as np
+from tqdm import tqdm
 import torch.optim as optim
 import torch.nn as nn
 import matplotlib.pyplot as plt
