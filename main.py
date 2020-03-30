@@ -68,6 +68,7 @@ def run_main():
     # REVIEW cnn
     model = StarNet().float()
     model.init_data(data, device)
+    model.to(device)
 
     # Define an optimizer and the loss function
     optimizer  = optim.Adam(model.parameters(), lr=params['lr'])
