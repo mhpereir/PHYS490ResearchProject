@@ -88,9 +88,14 @@ if __name__ == '__main__':
     
     model.to(device)
     
+    flag = True
     # Training loop
     for epoch in range(1, num_epochs + 1):
-        train_val,time_epoch = model.backprop(data, loss, optimizer, n_train, device)
+        
+        if epoch != 1 and data.train_flag == 1:
+            flag = False
+        
+        train_val,time_epoch = model.backprop(data, loss, optimizer, n_train, device, flag)
         obj_vals.append(train_val)
         
         
