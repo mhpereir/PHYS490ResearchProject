@@ -97,7 +97,7 @@ def run_main():
 
     # Training loop
     print('Training over {} epochs:'.format(num_epochs))
-    with tqdm(total=epochs, dynamic_ncols=True) as pbar:
+    with tqdm(total=num_epochs, dynamic_ncols=True) as pbar:
         for epoch in range(1, num_epochs + 1):
             # Training
             train_val, time_epoch = model.backprop(data, loss, optimizer, n_train, device)
