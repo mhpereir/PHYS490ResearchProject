@@ -10,7 +10,6 @@ class Data():
         self.test_flag = 0
         self.n_cross = int(n_cross)
         self.n_rank_max_train = int(n_rank_max)
-        self.n_rank_max_test = int(n_rank_max)
 
         training_data = os.path.join(data_file_path, 'training_data.h5')
         test_data = os.path.join(data_file_path, 'test_data.h5')
@@ -27,7 +26,6 @@ class Data():
         if 'r' in test:
             self.test_file_name = test_data
             self.test_flag = 1
-            self.n_rank_max_test = 1
         else:
             self.test_file_name = synth_data
             self.test_flag = 2
