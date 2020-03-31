@@ -92,7 +92,7 @@ def run_main():
     # model.init_data(data, device)
     model.to(device)
     if device == 'cpu':
-        if max_cpu and os.cpu_count > 4:  # Maximize the CPU
+        if max_cpu and (os.cpu_count > 4):  # Maximize the CPU
             num_processes = os.cpu_count()
         else:  # Preserve the CPU for other activities
             num_processes = torch.get_num_threads()
