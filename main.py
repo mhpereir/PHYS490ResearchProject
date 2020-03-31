@@ -46,9 +46,9 @@ def str2bool(s):
     ''' Boolean argparse typecaster, since in-built bool acts unexpectedly '''
     if isinstance(s, bool):
         return s
-    if v.lower() in ('yes', 'y', 'true', 't', '1'):
+    if s.lower() in ('yes', 'y', 'true', 't', '1'):
         return True
-    elif v.lower() in ('no', 'none', 'n', 'false', 'f', '0'):
+    elif s.lower() in ('no', 'none', 'n', 'false', 'f', '0'):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
