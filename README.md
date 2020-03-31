@@ -7,9 +7,9 @@ Authors:
 - Names: Matthew Pereira Wilson, Shoshannah Byrne-Mamahit, Shreyas Shankar
 - Student IDs: 20644035, 20615468, 20602181
 
-**StarNet** is a convolutional neural network model that predicts stellar parameters from stellar spectra, given a set of previously estimated stellar parameters. This program is designed to work with the datasets described in the paper *An application of deep learning in the analysis of stellar spectra, Fabbro et al (2017)*, and the pre-processed datasets can be found at the URL below.
+**StarNet** is a convolutional neural network model that predicts stellar parameters from stellar spectra, given a set of previously estimated stellar parameters. This program is designed to work with the datasets described in the paper *An application of deep learning in the analysis of stellar spectra, Fabbro et al (2017)*. The pre-processed datasets used are `ASSET.h5`, `test_data.h5`, and `training_data.h5`, all of which can be found at the URL below within the base directory `/starnet/public`.
 
-Paper: https://academic.oup.com/mnras/article/475/3/2978/4775133
+Paper: https://academic.oup.com/mnras/article/475/3/2978/4775133<br/>
 Data : https://www.canfar.net/storage/list/starnet/public
 
 ## Dependencies
