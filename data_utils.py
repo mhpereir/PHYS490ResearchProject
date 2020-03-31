@@ -54,7 +54,7 @@ class Data():
             
                 mean_list = []
                 std_list  = []
-            
+                                
                 for var in ['FE_H', 'LOGG', 'TEFF']:
                     
                     array = np.array(f5['ASSET {} train'.format(var)], dtype=float)
@@ -80,7 +80,8 @@ class Data():
             
                 n = len(spect[0,:])
             
-                x_train = spect.reshape(-1,1,n)
+                x_train = spect/(np.median(spect, axis=1)[:,None])
+                x_train = x_train.reshape(-1,1,n)
                 y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
                 
                 self.x_cross = x_train[0:self.n_cross,:,:]
@@ -118,7 +119,8 @@ class Data():
             
                 n = len(spect[0,:])
                 
-                self.x_train = spect.reshape(-1,1,n)
+                self.x_train = spect/(np.median(spect, axis=1)[:,None])
+                self.x_train = self.x_train.reshape(-1,1,n)
                 self.y_train = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
                 
                 #generate SNR and add to spectra
@@ -133,7 +135,8 @@ class Data():
                 
                     n = len(spect[0,:])
                     
-                    self.x_cross = spect.reshape(-1,1,n)
+                    self.x_cross = spect/(np.median(spect, axis=1)[:,None])
+                    self.x_cross = self.x_cross.reshape(-1,1,n)
                     self.y_cross = np.concatenate((fe_h, logg, teff), axis=1).reshape(-1,3)
                     
                     #generate SNR and add to spectra
@@ -171,7 +174,8 @@ class Data():
                 self.snr = np.array(f5['combined_snr'], dtype=float)
                 
                 n = len(spect[0,:])
-                self.x_test = spect.reshape(-1,1,n)[:,:,:]
+                self.x_test = spect/(np.median(spect, axis=1)[:,None])
+                self.x_test = self.x_test.reshape(-1,1,n)[:,:,:]
             
             elif self.test_flag == 2:
                 fe_h  = np.array(f5['ASSET FE_H test'], dtype=float)
@@ -180,7 +184,8 @@ class Data():
                 spect = np.array(f5['ASSET spectrum test'], dtype=float)
                 
                 n = len(spect[0,:])
-                self.x_test = spect.reshape(-1,1,n)[:,:,:]
+                self.x_test = spect/(np.median(spect, axis=1)[:,None])
+                self.x_test = self.x_test.reshape(-1,1,n)[:,:,:]
             
                 #generate SNR and add to spectra
                 SNRs = np.random.randint(20,250,np.shape(self.x_test)[0])
@@ -208,6 +213,6 @@ class Data():
         #Pnoise = Psignal/SNR
         for i in range(0,len(SNR)):
             Pnoise = Psignal[i]/SNR[i]
-            noise = np.random.normal(0,np.sqrt(Pnoise),n) #n = len of spectra 
+            noise = np.random.normal(0,Pnoise,n) #n = len of spectra 
             spec[i] = np.copy(spec[i]) + noise
         
