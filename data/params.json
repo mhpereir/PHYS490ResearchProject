@@ -1,8 +1,8 @@
 {
-	"n_epoch"	: 40,
-	"n_cross"	: 750,
+	"n_epoch"	: 30,
+	"n_cross"	: 3750,
 	"lr"		: 7e-4,
 	"n_epoch_v"	: 1,
 	"n_mini_batch"	: 32,
-	"n_rank"	: 6
+	"n_rank"	: 1
 }
