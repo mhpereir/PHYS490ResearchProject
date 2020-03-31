@@ -43,7 +43,7 @@ class StarNet(nn.Module):
             nn.MaxPool1d(kernel_size=4, stride=4, padding=0),
             # nn.Dropout(0.2, inplace=True),
             nn.Flatten(),
-            nn.Linear(115344, 256),
+            nn.Linear(115328, 256),
             nn.ReLU(),
             nn.BatchNorm1d(256),
             # nn.Dropout(0.3, inplace=True),
