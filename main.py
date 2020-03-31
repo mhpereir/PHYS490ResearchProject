@@ -91,7 +91,7 @@ def run_main():
     model = StarNet().float()
     # model.init_data(data, device)
     model.to(device)
-    if device == 'cpu':
+    if str(device) == 'cpu':
         if max_cpu and (os.cpu_count() > 4):  # Maximize the CPU
             num_processes = os.cpu_count()
         else:  # Preserve the CPU for other activities
