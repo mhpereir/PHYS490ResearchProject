@@ -11,9 +11,9 @@ class StarNet(nn.Module):
     Neural network class.
     Architecture:
         Input         (1x7214)
-        Convolution_1 (4  @ 1x7214)     [ReLU]
-        Convolution_2 (16 @ 1x7214)     [ReLU]
-        Max Pooling   (16 @ 1x1803)
+        Convolution_1 (8  @ 1x7214)     [ReLU]
+        Convolution_2 (8 @ 1x7214)      [ReLU]
+        Max Pooling   (8 @ 1x1801)
         FC_1          (1x256)           [ReLU]
         FC_2          (1x128)           [ReLU]
         FC_3          (1x3)             [Linear]
@@ -22,24 +22,40 @@ class StarNet(nn.Module):
     def __init__(self):
         super(StarNet, self).__init__()
 
-        self.conv1 = nn.Conv1d(in_channels=1, out_channels=4,
-                               kernel_size=8, stride=1, padding=1)
-        self.conv2 = nn.Conv1d(
-            in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
-        self.maxpool = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
-
-        self.fc1 = nn.Linear(28816, 256)
-        self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, 3)
+        self.cnn = nn.Sequential(
+            nn.Conv1d(in_channels=1, out_channels=8,
+                      kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.LayerNorm(7214),
+            nn.Conv1d(in_channels=8, out_channels=8,
+                      kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.LayerNorm(7214),
+            nn.Dropout(0.2, inplace=True),
+            nn.Conv1d(in_channels=1, out_channels=8,
+                      kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.LayerNorm(7214),
+            nn.Conv1d(in_channels=8, out_channels=8,
+                      kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.LayerNorm(7214),
+            nn.AvgPool1d(kernel_size=4, stride=4, padding=0),
+            nn.Dropout(0.2, inplace=True),
+            nn.Flatten(),
+            nn.Linear(14408, 256),
+            nn.ReLU(),
+            nn.BatchNorm1d(256),
+            nn.Dropout(0.3, inplace=True),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.Dropout(0.2, inplace=True),
+            nn.Linear(128, 3)
+        )
 
     def forward(self, x):
-        out = func.relu(self.conv1(x))
-        out = func.relu(self.conv2(out))
-        out = self.maxpool(out)
-        out = out.view(out.size(0), -1)  # flatten for FC
-        out = func.relu(self.fc1(out))
-        out = func.relu(self.fc2(out))
-        out = self.fc3(out)
+        out = self.cnn(x)
         return out
 
     def backprop(self, data, loss, optimizer, n_train, device, flag):
@@ -63,8 +79,8 @@ class StarNet(nn.Module):
             for i in range(iters):
                 args_lower = i*n_train
                 args_upper = (i+1)*n_train
-                    
-                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
+
+                inputs = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
                     device)
                 targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper, :]).float().to(
                     device)
@@ -83,7 +99,7 @@ class StarNet(nn.Module):
                 args_lower = (i+1)*n_train
                 args_upper = n_total
 
-                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
+                inputs = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
                     device)
                 targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper, :]).float().to(
                     device)
@@ -102,11 +118,11 @@ class StarNet(nn.Module):
         return np.mean(loss_vals), ellapsed_time
 
     def cross(self, data, loss, device):
-        inputs  = torch.from_numpy(data.x_cross[:,:,:]).float().to(
+        inputs = torch.from_numpy(data.x_cross[:, :, :]).float().to(
                 device)
-        targets = torch.from_numpy(data.y_cross_norm[:,:]).float().to(
+        targets = torch.from_numpy(data.y_cross_norm[:, :]).float().to(
                 device)
-        
+
         self.eval()
         with torch.no_grad():
             outputs = self(inputs)
