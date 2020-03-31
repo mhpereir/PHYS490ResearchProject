@@ -5,7 +5,7 @@ from matplotlib import gridspec, cm, colors
 from scipy.optimize import curve_fit
 
 
-class post_processing():
+class post_processing(): #Init data arrays for plotting utils
     def __init__(self, model_results, model_targets, respath, trialname):
 
         model_Fe = model_results[:, 0]
@@ -26,7 +26,7 @@ class post_processing():
         self.trialname = trialname
         self.respath = respath
 
-    def SN_hist(self, data, data_SN, upper_SN, lower_SN):
+    def SN_hist(self, data, data_SN, upper_SN, lower_SN): #Generate histograms for points above/below set SN
         low_SN = data[np.where(data_SN <= lower_SN)]
         high_SN = data[np.where(data_SN >= upper_SN)]
         low_SN_hist = np.histogram(low_SN)
@@ -59,9 +59,9 @@ class post_processing():
         fig, axs = pplt.subplots(3, 2, gridspec_kw=gs_kw)
         #plot params
         s = 1
-        cmap = cm.get_cmap('bone_r')  # 'inferno_r'
+        cmap = cm.get_cmap('bone_r')
         new_cmap = colors.LinearSegmentedColormap.from_list('trunc({n},{a:.2f},{b:.2f})'.format(
-            n=cmap.name, a=0.2, b=1.0), cmap(np.linspace(0.2, 1.0, 100)))
+            n=cmap.name, a=0.2, b=1.0), cmap(np.linspace(0.2, 1.0, 100))) #adjust colormap to get rid of very light colors
 
         rgbahigh = new_cmap(0.9)
         rgbalow = new_cmap(0.1)

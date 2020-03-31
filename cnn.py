@@ -19,7 +19,7 @@ class StarNet(nn.Module):
         FC_3          (1x3)             [Linear]
     '''
 
-    def __init__(self):
+    def __init__(self): #Define CNN Architecture
         super(StarNet, self).__init__()
 
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=4,
@@ -32,7 +32,7 @@ class StarNet(nn.Module):
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 3)
 
-    def forward(self, x):
+    def forward(self, x): #Define forward pass
         out = func.relu(self.conv1(x))
         out = func.relu(self.conv2(out))
         out = self.maxpool(out)
@@ -42,23 +42,23 @@ class StarNet(nn.Module):
         out = self.fc3(out)
         return out
 
-    def backprop(self, data, loss, optimizer, n_train, device, flag):
+    def backprop(self, data, loss, optimizer, n_train, device, flag): #Training algorithm
         self.train()
         loss_vals = []
 
         start_time = time()
 
-        for n in range(0, data.n_rank_max_train):
+        for n in range(0, data.n_rank_max_train): #segment training loop into `ranks' for managing large train arrays
 
             print('Rank: [{}/{}]'.format(n+1, data.n_rank_max_train))
-            if flag:
+            if flag: #initialize train arrays, only need to do this on the first training rank
                 data.load_train(n)
                 #self.init_data(data, device)
             else:
                 pass
 
             n_total = len(data.x_train[:, 0, 0])
-            iters = int(n_total // n_train)
+            iters = int(n_total // n_train) #iterate training into batches 
 
             for i in range(iters):
                 args_lower = i*n_train
@@ -101,7 +101,7 @@ class StarNet(nn.Module):
 
         return np.mean(loss_vals), ellapsed_time
 
-    def cross(self, data, loss, device):
+    def cross(self, data, loss, device): #Cross validation data
         inputs  = torch.from_numpy(data.x_cross[:,:,:]).float().to(
                 device)
         targets = torch.from_numpy(data.y_cross_norm[:,:]).float().to(
@@ -114,11 +114,11 @@ class StarNet(nn.Module):
 
         return cross_val.item()
 
-    def model_predictions(self, data, n_train, device):
+    def model_predictions(self, data, n_train, device): #Define model evaluation
         self.eval()
         with torch.no_grad():
             n_total = len(data.x_test[:, 0, 0])
-            iters = int(np.floor(n_total/n_train))
+            iters = int(np.floor(n_total/n_train)) #iterate testing into batches
             loss_vals = []
 
             print('Running #{} iterations for test data.'.format(iters))
@@ -156,7 +156,7 @@ class StarNet(nn.Module):
 
         return predicted_target_array
 
-    def check_early_stop(self, loss_cross, patience, min_diff):
+    def check_early_stop(self, loss_cross, patience, min_diff): #Define early stopping conditions
 
         if len(loss_cross) < 2:
             self.counter = 0
@@ -171,7 +171,7 @@ class StarNet(nn.Module):
             if (self.counter == patience):
                 return True
 
-    def reset(self):
+    def reset(self): #Reset all model weights
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
         self.maxpool.reset_parameters()

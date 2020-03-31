@@ -8,7 +8,7 @@ Data : https://www.canfar.net/storage/list/starnet/public
 Authors:
 
 - Names: Matthew Pereira Wilson, Shoshannah Byrne-Mamahit, Shreyas Shankar
-- Student IDs: 20644035, ??, 20602181
+- Student IDs: 20644035, 20615468, 20602181
 
 ## Dependencies
 

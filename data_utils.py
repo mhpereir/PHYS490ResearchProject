@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Data():
-    def __init__(self, data_file_path, train, test, n_rank_max, n_cross):
+    def __init__(self, data_file_path, train, test, n_rank_max, n_cross): #Set data paths and flags for different cases
 
         self.train_flag = 0
         self.test_flag = 0
@@ -32,7 +32,7 @@ class Data():
 
         self.find_normalize()
 
-    def find_normalize(self):
+    def find_normalize(self): #Find normalization constants for targets
 
         with h5py.File(self.train_file_name, 'r') as f5:
 
@@ -71,10 +71,10 @@ class Data():
                 mean_list = None
                 std_list  = None
 
-    def load_train(self, n_rank):
+    def load_train(self, n_rank): #Manage how to load training data
         with h5py.File(self.train_file_name, 'r') as f5:
 
-            if self.train_flag == 1:
+            if self.train_flag == 1: #Training on real, can load entire dataset set at once
                 fe_h  = np.array(f5['FE_H'], dtype=np.float)
                 logg  = np.array(f5['LOGG'], dtype=np.float)
                 teff  = np.array(f5['TEFF'], dtype=np.float)
@@ -98,7 +98,7 @@ class Data():
                 teff  = None
                 spect = None
 
-            elif self.train_flag == 2:
+            elif self.train_flag == 2: #Training on synth, load dataset in segments called `ranks'
                 n_init = self.n_cross
                 rank_len = np.floor(
                     (len(f5['ASSET FE_H train']) - self.n_cross) / self.n_rank_max_train)
@@ -164,7 +164,7 @@ class Data():
 
         self.normalize_targets()
 
-    def close(self, which):
+    def close(self, which): #Empty arrays to save memory
         if which == 'train':
             self.x_cross = None
             self.y_cross = None
@@ -174,7 +174,7 @@ class Data():
             self.x_test = None
             self.y_test = None
 
-    def load_test(self):
+    def load_test(self): #Load test data arrays
         with h5py.File(self.test_file_name, 'r') as f5:
 
             if self.test_flag == 1:
@@ -212,16 +212,16 @@ class Data():
         teff = None
         spect = None
 
-    def normalize_targets(self):
+    def normalize_targets(self): #Normalize each target array
         self.y_train_norm = np.add(
             self.y_train, -self.mean_labels)/self.std_labels
         self.y_cross_norm = np.add(
             self.y_cross, -self.mean_labels)/self.std_labels
 
-    def re_normalize_targets(self, trained_targets):
+    def re_normalize_targets(self, trained_targets): #Undo normalization of target array
         return np.add(trained_targets*self.std_labels, self.mean_labels)
 
-    def add_SNR(self, SNR, spec, n):
+    def add_SNR(self, SNR, spec, n): #Gen Gauss. random noise and add to spectra
         Psignal = np.mean(spec, axis=2)[:, 0]
         #Pnoise = Psignal/SNR
         for i in range(0, len(SNR)):
