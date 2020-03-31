@@ -32,12 +32,15 @@ def get_args():
         help='Boolean flag to specify verbose output (default: False)')
     parser.add_argument('-c', '--cuda', type=str2bool, default=False, metavar='True',
         help='Boolean flag to specify to use CUDA (default: False)')
+    parser.add_argument('-s', '--save', type=str2bool, default=True, metavar='True',
+        help='Boolean flag to specify whether to save the model\'s learned \
+        parameters to the output_path (default: True)')
     parser.add_argument('-m', '--max_cpu', type=str2bool, default=False, metavar='True',
-        help="Boolean flag to specify whether to use all CPU cores if CUDA is not \
+        help='Boolean flag to specify whether to use all CPU cores if CUDA is not \
         in use or is unavailable. Note that this will restrict other system processes \
         from running. Recommended to only enable on servers. (default: False, \
-        resorts to using PyTorch's get_num_threads implementation, which usually \
-        maximizes use across 50%% of cores)")
+        resorts to using PyTorch\'s get_num_threads implementation, which usually \
+        maximizes use across 50%% of cores)')
 
     return parser.parse_args()
 
@@ -64,6 +67,7 @@ def run_main():
     output_path      = args.output_path
     verbose          = args.verbose
     cuda_input       = args.cuda
+    save_model       = args.save
     max_cpu          = args.max_cpu
 
     # Load hyperparameters from file
@@ -87,8 +91,8 @@ def run_main():
     model = StarNet().float()
     # model.init_data(data, device)
     model.to(device)
-    if device == 'cpu':
-        if max_cpu and os.cpu_count > 4:  # Maximize the CPU
+    if str(device) == 'cpu':
+        if max_cpu and (os.cpu_count() > 4):  # Maximize the CPU
             num_processes = os.cpu_count()
         else:  # Preserve the CPU for other activities
             num_processes = torch.get_num_threads()
@@ -169,8 +173,8 @@ def run_main():
         os.mkdir(output_path)
     plt.savefig(os.path.join(output_path, 'loss.png'), dpi=400)
 
-
-    torch.save(model.state_dict(), os.path.join(output_path, 'weights_{}_{}.pt'.format(train_data,epoch+1)))
+    if save_model:
+        torch.save(model.state_dict(), os.path.join(output_path, 'weights_{}_{}.pt'.format(train_data, epoch+1)))
 
     data.close('train')
 
