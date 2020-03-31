@@ -28,14 +28,14 @@ def get_args():
         type=str, help='Which testing dataset to use: real or synthetic?')
     parser.add_argument('-o', '--output_path', type=str, metavar='path/to/results',
         default='results/', help='Path to store plots and results')
-    parser.add_argument('-v', '--verbose', type=bool, default=False, metavar='True',
+    parser.add_argument('-v', '--verbose', type=str2bool, default=False, metavar='True',
         help='Boolean flag to specify verbose output (default: False)')
-    parser.add_argument('-c', '--cuda', type=bool, default=False, metavar='True',
+    parser.add_argument('-c', '--cuda', type=str2bool, default=False, metavar='True',
         help='Boolean flag to specify to use CUDA (default: False)')
-    parser.add_argument('-s', '--save', type=bool, default=True, metavar='True',
+    parser.add_argument('-s', '--save', type=str2bool, default=True, metavar='True',
         help='Boolean flag to specify whether to save the model\'s learned \
         parameters to the output_path (default: True)')
-    parser.add_argument('-m', '--max_cpu', type=bool, default=False, metavar='True',
+    parser.add_argument('-m', '--max_cpu', type=str2bool, default=False, metavar='True',
         help='Boolean flag to specify whether to use all CPU cores if CUDA is not \
         in use or is unavailable. Note that this will restrict other system processes \
         from running. Recommended to only enable on servers. (default: False, \
@@ -43,6 +43,18 @@ def get_args():
         maximizes use across 50%% of cores)')
 
     return parser.parse_args()
+
+
+def str2bool(s):
+    ''' Boolean argparse typecaster, since in-built bool acts unexpectedly '''
+    if isinstance(s, bool):
+        return s
+    if s.lower() in ('yes', 'y', 'true', 't', '1'):
+        return True
+    elif s.lower() in ('no', 'none', 'n', 'false', 'f', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 def run_main():
