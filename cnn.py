@@ -24,22 +24,22 @@ class StarNet(nn.Module):
 
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=4,
                                kernel_size=8, stride=1, padding=1)
-        self.conv2 = nn.Conv1d(
-            in_channels=4, out_channels=16, kernel_size=8, stride=1, padding=1)
+        #self.conv2 = nn.Conv1d(in_channels=4, out_channels=16,
+        #                       kernel_size=8, stride=1, padding=1)
         self.maxpool = nn.MaxPool1d(kernel_size=4, stride=4, padding=0)
 
-        self.fc1 = nn.Linear(28816, 256)
-        self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, 3)
+        self.fc1 = nn.Linear(7208, 3)
+        #self.fc2 = nn.Linear(256, 128)
+        #self.fc3 = nn.Linear(128, 3)
 
     def forward(self, x):
         out = func.relu(self.conv1(x))
-        out = func.relu(self.conv2(out))
+        #out = func.relu(self.conv2(out))
         out = self.maxpool(out)
         out = out.view(out.size(0), -1)  # flatten for FC
-        out = func.relu(self.fc1(out))
-        out = func.relu(self.fc2(out))
-        out = self.fc3(out)
+        #out = func.relu(self.fc1(out))
+        #out = func.relu(self.fc2(out))
+        out = self.fc1(out)
         return out
 
     def backprop(self, data, loss, optimizer, n_train, device, flag):
@@ -113,6 +113,31 @@ class StarNet(nn.Module):
             cross_val = loss(outputs, targets)
 
         return cross_val.item()
+
+    def test_loss(self,data,loss,device, n_train):
+        n_total = len(data.x_test[:, 0, 0])
+        iters = int(n_total // n_train)
+        self.eval()
+        
+        loss_list = []
+        
+        with torch.no_grad():
+            for i in range(iters):
+                args_lower = i*n_train
+                args_upper = (i+1)*n_train
+                    
+                inputs  = torch.from_numpy(data.x_test[args_lower:args_upper, :, :]).float().to(
+                    device)
+                targets = torch.from_numpy(data.y_test_norm[args_lower:args_upper, :]).float().to(
+                    device)
+
+                outputs = self(inputs)
+                test_val = loss(outputs, targets)
+
+                loss_list.append(test_val.item())
+        
+        return np.mean(loss_list)
+
 
     def model_predictions(self, data, n_train, device):
         self.eval()

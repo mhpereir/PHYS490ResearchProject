@@ -166,13 +166,16 @@ class Data():
 
     def close(self, which):
         if which == 'train':
-            self.x_cross = None
-            self.y_cross = None
-            self.x_train = None
-            self.y_train = None
+            self.x_cross      = None
+            self.y_cross      = None
+            self.y_cross_norm = None
+            self.x_train      = None
+            self.y_train      = None
+            self.y_train_norm = None
         elif which == 'test':
-            self.x_test = None
-            self.y_test = None
+            self.x_test      = None
+            self.y_test      = None
+            self.y_test_norm = None
 
     def load_test(self):
         with h5py.File(self.test_file_name, 'r') as f5:
@@ -206,6 +209,8 @@ class Data():
 
         self.y_test = np.concatenate(
             (fe_h, logg, teff), axis=1).reshape(-1, 3)[:, :]
+        
+        self.normalize_test()
 
         fe_h = None
         logg = None
@@ -217,6 +222,10 @@ class Data():
             self.y_train, -self.mean_labels)/self.std_labels
         self.y_cross_norm = np.add(
             self.y_cross, -self.mean_labels)/self.std_labels
+
+    def normalize_test(self):
+        self.y_test_norm = np.add(
+            self.y_test, -self.mean_labels)/self.std_labels
 
     def re_normalize_targets(self, trained_targets):
         return np.add(trained_targets*self.std_labels, self.mean_labels)

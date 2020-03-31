@@ -158,14 +158,17 @@ def run_main():
     plt.savefig(os.path.join(output_path, 'loss.png'), dpi=400)
 
     
-    torch.save(model.state_dict(), os.path.join(output_path, 'weights_{}_{}.pt'.format(train_data,epoch+1)))
-
+    #torch.save(model.state_dict(), os.path.join(output_path, 'weights_{}_{}.pt'.format(train_data,epoch+1)))
+    
+    print('train loss: {}\ncross loss: {}'.format(obj_vals[-1], cross_vals[-1]))
+    
     data.close('train')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     ## beginning of post processing
 
     data.load_test()
+    print('test loss: {}'.format(model.test_loss(data, loss, device, n_train)))
     predicted_targets = model.model_predictions(data, n_train, device)
     predicted_targets = data.re_normalize_targets(predicted_targets)
     real_targets = data.y_test
