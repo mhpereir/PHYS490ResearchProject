@@ -11,7 +11,7 @@ __pycache__/
 *.npy
 *.txt
 *.ppk
-*.png
+*.pdf
 
 # Distribution / packaging
 .Python
