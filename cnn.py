@@ -32,7 +32,7 @@ class StarNet(nn.Module):
             nn.ReLU(),
             nn.LayerNorm(7214),
             nn.Dropout(0.2, inplace=True),
-            nn.Conv1d(in_channels=1, out_channels=8,
+            nn.Conv1d(in_channels=8, out_channels=8,
                       kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.LayerNorm(7214),
