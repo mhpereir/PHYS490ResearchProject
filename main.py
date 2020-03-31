@@ -53,7 +53,7 @@ def run_main():
     verbose          = args.verbose
     cuda_input       = args.cuda
     max_cpu          = args.max_cpu
-
+        
     # Load hyperparameters from file
     params_path = os.path.join(data_path, 'params.json')
     with open(params_path) as paramfile:
@@ -66,9 +66,9 @@ def run_main():
 
     # Load in the training datasets
     data  = Data(data_path, train_data, test_data, n_rank_max, n_cross)
-
-    # CUDA usage
-    device = torch.device('cuda' if torch.cuda.is_available() and args.cuda else 'cpu')
+    
+    # CUDA usage 
+    device = torch.device('cuda' if (torch.cuda.is_available() and cuda_input) else 'cpu')
     print('\nRunning on {}\n'.format(device))
 
     # Initialize the model
@@ -99,7 +99,7 @@ def run_main():
                                                       min_lr=reduce_lr_min,
                                                       threshold=reduce_lr_threshold,
                                                       threshold_mode=reduce_lr_threshold_mode,
-                                                      verbose=True)
+                                                      verbose=verbose)
 
     early_stop_patience = 4
     early_stop_min_diff = 0.0001
@@ -156,7 +156,9 @@ def run_main():
     if not os.path.exists(output_path):
         os.mkdir(output_path)
     plt.savefig(os.path.join(output_path, 'loss.png'), dpi=400)
-    plt.show()
+
+    
+    torch.save(model.state_dict(), os.path.join(output_path, 'weights_{}_{}.pt'.format(train_data,epoch+1)))
 
     data.close('train')
 

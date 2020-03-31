@@ -12,23 +12,23 @@ class Data():
         self.n_rank_max_train = int(n_rank_max)
 
         training_data = os.path.join(data_file_path, 'training_data.h5')
-        test_data = os.path.join(data_file_path, 'test_data.h5')
-        synth_data = os.path.join(data_file_path, 'ASSET.h5')
+        test_data     = os.path.join(data_file_path, 'test_data.h5')
+        synth_data    = os.path.join(data_file_path, 'ASSET.h5')
 
         if 'r' in train:
-            self.train_file_name = training_data
-            self.train_flag = 1
+            self.train_file_name  = training_data
+            self.train_flag       = 1
             self.n_rank_max_train = 1
         else:
-            self.train_file_name = synth_data
-            self.train_flag = 2
+            self.train_file_name  = synth_data
+            self.train_flag       = 2
 
         if 'r' in test:
-            self.test_file_name = test_data
-            self.test_flag = 1
+            self.test_file_name   = test_data
+            self.test_flag        = 1
         else:
-            self.test_file_name = synth_data
-            self.test_flag = 2
+            self.test_file_name   = synth_data
+            self.test_flag        = 2
 
         self.find_normalize()
 
@@ -45,11 +45,11 @@ class Data():
                     (fe_h, logg, teff), axis=1).reshape(-1, 3)
 
                 self.mean_labels = np.mean(y_train, axis=0)
-                self.std_labels = np.std(y_train, axis=0)
+                self.std_labels  = np.std(y_train, axis=0)
 
-                fe_h = None
-                logg = None
-                teff = None
+                fe_h    = None
+                logg    = None
+                teff    = None
                 y_train = None
 
             elif self.train_flag == 2:
@@ -66,18 +66,18 @@ class Data():
                     std_list.append(np.std(array))
 
                 self.mean_labels = np.array(mean_list)
-                self.std_labels = np.array(std_list)
+                self.std_labels  = np.array(std_list)
 
                 mean_list = None
-                std_list = None
+                std_list  = None
 
     def load_train(self, n_rank):
         with h5py.File(self.train_file_name, 'r') as f5:
 
             if self.train_flag == 1:
-                fe_h = np.array(f5['FE_H'], dtype=np.float)
-                logg = np.array(f5['LOGG'], dtype=np.float)
-                teff = np.array(f5['TEFF'], dtype=np.float)
+                fe_h  = np.array(f5['FE_H'], dtype=np.float)
+                logg  = np.array(f5['LOGG'], dtype=np.float)
+                teff  = np.array(f5['TEFF'], dtype=np.float)
                 spect = np.array(f5['spectrum'], dtype=np.float)
 
                 n = len(spect[0, :])
@@ -156,11 +156,11 @@ class Data():
                         20, 250, np.shape(self.x_cross)[0])
                     self.add_SNR(SNRs, self.x_cross, n)
 
-                fe_h = None
-                logg = None
-                teff = None
+                fe_h  = None
+                logg  = None
+                teff  = None
                 spect = None
-                SNRs = None
+                SNRs  = None
 
         self.normalize_targets()
 

@@ -32,15 +32,6 @@ class StarNet(nn.Module):
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 3)
 
-    def init_data(self, data, device):
-        self.inputs_train = torch.from_numpy(data.x_train).float().to(device)
-        self.targets_train = torch.from_numpy(
-            data.y_train_norm).float().to(device)
-
-        self.inputs_cross = torch.from_numpy(data.x_cross).float().to(device)
-        self.targets_cross = torch.from_numpy(
-            data.y_cross_norm).float().to(device)
-
     def forward(self, x):
         out = func.relu(self.conv1(x))
         out = func.relu(self.conv2(out))
@@ -53,7 +44,6 @@ class StarNet(nn.Module):
 
     def backprop(self, data, loss, optimizer, n_train, device, flag):
         self.train()
-
         loss_vals = []
 
         start_time = time()
@@ -63,20 +53,20 @@ class StarNet(nn.Module):
             print('Rank: [{}/{}]'.format(n+1, data.n_rank_max_train))
             if flag:
                 data.load_train(n)
-                self.init_data(data, device)
+                #self.init_data(data, device)
             else:
                 pass
 
-            n_total = len(self.inputs_train[:, 0, 0])
+            n_total = len(data.x_train[:, 0, 0])
             iters = int(n_total // n_train)
 
             for i in range(iters):
                 args_lower = i*n_train
                 args_upper = (i+1)*n_train
-
-                inputs = self.inputs_train[args_lower:args_upper, :, :].float().to(
+                    
+                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
                     device)
-                targets = self.targets_train[args_lower:args_upper, :].float().to(
+                targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper, :]).float().to(
                     device)
 
                 outputs = self(inputs)
@@ -93,9 +83,9 @@ class StarNet(nn.Module):
                 args_lower = (i+1)*n_train
                 args_upper = n_total
 
-                inputs = self.inputs_train[args_lower:args_upper, :, :].float().to(
+                inputs  = torch.from_numpy(data.x_train[args_lower:args_upper, :, :]).float().to(
                     device)
-                targets = self.targets_train[args_lower:args_upper, :].float().to(
+                targets = torch.from_numpy(data.y_train_norm[args_lower:args_upper, :]).float().to(
                     device)
 
                 outputs = self(inputs)
@@ -112,8 +102,11 @@ class StarNet(nn.Module):
         return np.mean(loss_vals), ellapsed_time
 
     def cross(self, data, loss, device):
-        inputs = self.inputs_cross[:, :, :].float().to(device)
-        targets = self.targets_cross[:, :].float().to(device)
+        inputs  = torch.from_numpy(data.x_cross[:,:,:]).float().to(
+                device)
+        targets = torch.from_numpy(data.y_cross_norm[:,:]).float().to(
+                device)
+        
         self.eval()
         with torch.no_grad():
             outputs = self(inputs)
